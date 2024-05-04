@@ -1,6 +1,6 @@
 namespace Passenger
 {
-  public class File
+  public class FileSystem
   {
     private static void Exceptions(Exception exception)
     {
@@ -22,12 +22,16 @@ namespace Passenger
     }
     public static string Read(string fileName)
     {
-      try { return new StreamReader(fileName).ReadToEnd(); }
+      try
+      {
+        if (!File.Exists(fileName)) return "";
+        return EnDeCoder.Decode(new StreamReader(fileName).ReadToEnd());
+      }
       catch (Exception exception) { Exceptions(exception); throw; }
     }
     public static void Write(string fileName, string data)
     {
-      try { new StreamWriter(fileName).Write(data); }
+      try { File.WriteAllText(fileName, EnDeCoder.Encode(data)); }
       catch (Exception exception) { Exceptions(exception); }
     }
   }

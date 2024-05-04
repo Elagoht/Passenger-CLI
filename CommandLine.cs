@@ -5,7 +5,23 @@ namespace Passenger
     private readonly Authorization authorization = new(EnDeCoder.JSWSecret);
     private readonly string command = args[0];
     private readonly string[] arguments = args.Skip(1).ToArray();
-    private readonly string helpText = @"Passenger CLI 0.1.0
+    public void Parse()
+    {
+      if (string.IsNullOrEmpty(command)) Error.MissingCommand();
+
+      switch (command)
+      {
+        case "help" or "--help" or "-h": Help(); break;
+        case "login" or "-l": Login(); break;
+        case "register" or "-r": Register(); break;
+        case "reset" or "-R": Reset(); break;
+        default: Error.UnknownCommand(); break;
+      }
+    }
+    // Commands
+    private static void Help()
+    {
+      Console.Write(@"Passenger CLI 0.1.0
   Copyright (C) 2024 Elagoht
   
   Store, retrieve, manage and generate passphrases securely using your own encode/decode algorithm. Every passenger client is created by user's itself and unique.
@@ -25,31 +41,31 @@ Commands:
   delete    -d [jwt] [id]        : delete an entry by its index
   help      -h --help            : show this help message and exit
   man       -m                   : show the manual page, if available
-";
-    public void Parse()
-    {
-      if (string.IsNullOrEmpty(command)) Error.MissingCommand();
-
-      switch (command)
-      {
-        case "help" or "--help" or "-h": Help(); break;
-        case "login" or "-l": Login(); break;
-        case "register" or "-r": Register(); break;
-        default: Error.UnknownCommand(); break;
-      }
+");
+      Environment.Exit(0);
     }
-    // Commands
-    private void Help() => Console.Write(helpText);
+
     private void Login()
     {
-      if (arguments.Length != 1)
-        Error.ArgumentCount("login", 1);
+      if (arguments.Length != 1) Error.ArgumentCount("login", 1);
       Console.WriteLine(authorization.GenerateToken(arguments[0]));
       Environment.Exit(0);
     }
     private void Register()
     {
-      if (arguments.Length < 2) Error.ArgumentCount("register", 1);
+      if (arguments.Length != 1) Error.ArgumentCount("register", 1);
+      if (Database.IsRegistered())
+        Console.WriteLine("passenger: already registered");
+      else
+        Database.Register(arguments[0]);
+    }
+    private void Reset()
+    {
+      if (arguments.Length != 2) Error.ArgumentCount("reset", 2);
+      if (authorization.ValidateToken(arguments[0]))
+        Database.Register(arguments[1]);
+      else
+        Console.WriteLine("passenger: invalid token");
     }
   }
 

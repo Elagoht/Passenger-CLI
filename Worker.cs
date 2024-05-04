@@ -111,8 +111,83 @@ namespace Passenger
     // *** Help and manual *** //
     public static void Manual()
     {
-      // Open manual page in man command
-      Process.Start("man", "./passenger-pm.1");
+      Console.WriteLine(@"PASSENGER(1)                 Passenger CLI Manual                 PASSENGER(1)
+
+NAME
+      Passenger - Portable and customizable password manager.
+
+SYNOPSIS
+      passenger [command] [*args]
+
+DESCRIPTION
+      Passenger is a command line password manager designed to be portable
+      and customizable. It allows users to securely store, retrieve, manage,
+      and generate passphrases using their own encode/decode algorithm,
+      created from the open-source EnDeCoder.cs file. Each build of the
+      Passenger client is unique, crafted by the user, ensuring a
+      personalized security algorithm.
+
+COMMANDS
+      login -l
+            Generate a JWT token to use other commands. Requires a
+            passphrase.
+            passenger login -l [passphrase]
+
+      register -r
+            Register a passphrase to the Passenger client.
+            passenger register [passphrase]
+
+      reset -R
+            Reset the passphrase of the Passenger client using a JWT token
+            and a new passphrase.
+            passenger reset [jwt] [new]
+
+      fetchAll -a
+            List all entries without displaying their passphrases, requires
+            a JWT token.
+            passenger fetchAll [jwt]
+
+      query -q
+            Search for a keyword in all entries, requires a JWT token.
+            passenger query [jwt] [keyword]
+
+      fetch -f
+            Retrieve an entry by its UUID, requires a JWT token.
+            passenger fetch [jwt] [uuid]
+
+      create -c
+            Store an entry with the given data, requires a JWT token.
+            passenger create [jwt] [data]
+
+      update -u
+            Update an entry by its UUID, requires a JWT token and JSON
+            formatted data.
+            passenger update [jwt] [uuid] [json]
+
+      delete -d
+            Delete an entry by its UUID, requires a JWT token.
+            passenger delete [jwt] [uuid]
+
+      version -v --version
+            Show the version of the Passenger software.
+            passenger version
+
+      help -h --help
+            Show this help message and exit.
+            passenger help
+
+      man -m Show the manual page, if available.
+            passenger man
+
+AUTHOR
+      Written by Elagoht.
+
+SEE ALSO
+      jq(1)
+
+0.1.0                              May 2024                       PASSENGER(1)"
+      );
+      Environment.Exit(0);
     }
 
     public static void Help()

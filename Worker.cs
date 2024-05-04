@@ -49,7 +49,7 @@ Commands:
     {
       if (arguments.Length != 2) Error.ArgumentCount("reset", 2);
       if (authorization.ValidateToken(arguments[0]))
-        Database.Register(arguments[1]);
+        Database.ResetPassphrase(arguments[1]);
       else
         Console.WriteLine("passenger: invalid token");
     }

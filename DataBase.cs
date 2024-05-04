@@ -98,6 +98,11 @@ namespace Passenger
       database.Entries = [];
       Save();
     }
+    public static void ResetPassphrase(string newPassphrase)
+    {
+      database.Passphrase = newPassphrase;
+      Save();
+    }
   }
 
   public class DatabaseModel

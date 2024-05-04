@@ -1,0 +1,80 @@
+.TH PASSENGER 1 "May 2024" "0.1.0" "Passenger CLI Manual"
+.SH NAME
+Passenger \- Portable and customizable password manager.
+.SH SYNOPSIS
+.B passenger
+[command] [*args]
+.SH DESCRIPTION
+.B Passenger
+is a command line password manager designed to be portable and customizable. It allows users to securely store, retrieve, manage, and generate passphrases using their own encode/decode algorithm, created from the open-source EnDeCoder.cs file. Each build of the Passenger client is unique, crafted by the user, ensuring a personalized security algorithm.
+.SH COMMANDS
+.TP
+.BR login " (l)"
+Generate a JWT token to use other commands. Requires a passphrase.
+.RS
+.B passenger login [passphrase]
+.RE
+.TP
+.BR register " (r)"
+Register a passphrase to the Passenger client.
+.RS
+.B passenger register [passphrase]
+.RE
+.TP
+.BR reset " (R)"
+Reset the passphrase of the Passenger client using a JWT token and a new passphrase.
+.RS
+.B passenger reset [jwt] [new]
+.RE
+.TP
+.BR get " (g)"
+List all entries without displaying their passphrases, requires a JWT token.
+.RS
+.B passenger get [jwt]
+.RE
+.TP
+.BR query " (q)"
+Search for a keyword in all entries, requires a JWT token.
+.RS
+.B passenger query [jwt] [keyword]
+.RE
+.TP
+.BR save " (s)"
+Store an entry with the given data, requires a JWT token.
+.RS
+.B passenger save [jwt] [data]
+.RE
+.TP
+.BR fetch " (f)"
+Retrieve an entry by its id, requires a JWT token.
+.RS
+.B passenger fetch [jwt] [id]
+.RE
+.TP
+.BR update " (u)"
+Update an entry by its id, requires a JWT token and JSON formatted data.
+.RS
+.B passenger update [jwt] [id] [json]
+.RE
+.TP
+.BR delete " (d)"
+Delete an entry by its index, requires a JWT token.
+.RS
+.B passenger delete [jwt] [id]
+.RE
+.TP
+.BR help " (h)"
+Show this help message and exit.
+.RS
+.B passenger help
+.RE
+.TP
+.BR man " (m)"
+Show the manual page, if available.
+.RS
+.B passenger man
+.RE
+.SH AUTHOR
+Written by Elagoht.
+.SH "SEE ALSO"
+.BR jq (1)

@@ -98,13 +98,12 @@ namespace Passenger
     public static void Update(string id, DatabaseEntry entry)
     {
       var index = database.Entries.FindIndex(entry => entry.Id == id);
-      if (index == -1)
-      {
-        Console.WriteLine("passenger: entry not found");
-        Environment.Exit(1);
-      }
+      if (index == -1) Error.EntryNotFound();
       entry = Validate.Entry(entry);
+
+      entry.Id = database.Entries[index].Id; // Preserve id
       entry.Created = database.Entries[index].Created; // Preserve created date
+      entry.Updated = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
       // Update entry in database and save
       database.Entries[index] = entry;
       SaveToFile();

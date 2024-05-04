@@ -9,67 +9,73 @@ Passenger \- Portable and customizable password manager.
 is a command line password manager designed to be portable and customizable. It allows users to securely store, retrieve, manage, and generate passphrases using their own encode/decode algorithm, created from the open-source EnDeCoder.cs file. Each build of the Passenger client is unique, crafted by the user, ensuring a personalized security algorithm.
 .SH COMMANDS
 .TP
-.BR login " (l)"
+.BR login " \-l"
 Generate a JWT token to use other commands. Requires a passphrase.
 .RS
-.B passenger login [passphrase]
+.B passenger login \-l [passphrase]
 .RE
 .TP
-.BR register " (r)"
+.BR register " \-r"
 Register a passphrase to the Passenger client.
 .RS
 .B passenger register [passphrase]
 .RE
 .TP
-.BR reset " (R)"
+.BR reset " \-R"
 Reset the passphrase of the Passenger client using a JWT token and a new passphrase.
 .RS
 .B passenger reset [jwt] [new]
 .RE
 .TP
-.BR get " (g)"
+.BR fetchAll " \-a"
 List all entries without displaying their passphrases, requires a JWT token.
 .RS
-.B passenger get [jwt]
+.B passenger fetchAll [jwt]
 .RE
 .TP
-.BR query " (q)"
+.BR query " \-q"
 Search for a keyword in all entries, requires a JWT token.
 .RS
 .B passenger query [jwt] [keyword]
 .RE
 .TP
-.BR save " (s)"
+.BR fetch " \-f"
+Retrieve an entry by its UUID, requires a JWT token.
+.RS
+.B passenger fetch [jwt] [uuid]
+.RE
+.TP
+.BR create " \-c"
 Store an entry with the given data, requires a JWT token.
 .RS
-.B passenger save [jwt] [data]
+.B passenger create [jwt] [data]
 .RE
 .TP
-.BR fetch " (f)"
-Retrieve an entry by its id, requires a JWT token.
+.BR update " \-u"
+Update an entry by its UUID, requires a JWT token and JSON formatted data.
 .RS
-.B passenger fetch [jwt] [id]
+.B passenger update [jwt] [uuid] [json]
 .RE
 .TP
-.BR update " (u)"
-Update an entry by its id, requires a JWT token and JSON formatted data.
+.BR delete " \-d"
+Delete an entry by its UUID, requires a JWT token.
 .RS
-.B passenger update [jwt] [id] [json]
+.B passenger delete [jwt] [uuid]
 .RE
 .TP
-.BR delete " (d)"
-Delete an entry by its index, requires a JWT token.
+.BR version " \-v" " \-\-version"
+Show the version of the Passenger software.
 .RS
-.B passenger delete [jwt] [id]
+.B passenger version 
 .RE
 .TP
-.BR help " (h)"
+.BR help " \-h" " \-\-help"
 Show this help message and exit.
 .RS
 .B passenger help
 .RE
 .TP
-.BR man " (m)"
+.BR man " \-m"
 Show the manual page, if available.
 .RS
 .B passenger man

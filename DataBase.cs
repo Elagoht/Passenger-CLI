@@ -19,9 +19,12 @@ namespace Passenger
         Environment.Exit(1);
       }
     }
+
+    // *** Database file *** //
     private static readonly string databaseFile = "./passenger.bus";
     private static readonly DatabaseModel database;
-    public static void Save()
+
+    public static void SaveToFile()
     {
       try
       {
@@ -34,7 +37,27 @@ namespace Passenger
         Environment.Exit(1);
       }
     }
-    public static void Append(DatabaseEntry entry)
+
+    // *** Authorization *** //
+    public static string GetPassphrase() => database.Passphrase;
+
+    public static bool IsRegistered() => !string.IsNullOrEmpty(database.Passphrase);
+
+    public static void Register(string passphrase)
+    {
+      database.Passphrase = passphrase;
+      database.Entries = [];
+      SaveToFile();
+    }
+
+    public static void ResetPassphrase(string newPassphrase)
+    {
+      database.Passphrase = newPassphrase;
+      SaveToFile();
+    }
+
+    // *** CRUD operations *** //
+    public static void Create(DatabaseEntry entry)
     {
       entry = Validate.Entry(entry);
       // Auto-generate id
@@ -43,8 +66,35 @@ namespace Passenger
       entry.Updated = entry.Created;
       // Append entry to database and save
       database.Entries.Add(entry);
-      Save();
+      SaveToFile();
     }
+
+    public static List<ExportableDatabaseEntry> FetchAll() => database.Entries.Select(entry =>
+      new ExportableDatabaseEntry
+      {
+        Id = entry.Id,
+        Platform = entry.Platform,
+        Username = entry.Username,
+        Email = entry.Email
+      }
+    ).ToList();
+
+    public static DatabaseEntry FetchOne(string id) => database.Entries
+      .Find(entry => entry.Id == id);
+
+    public static List<ExportableDatabaseEntry> Query(string keyword) => database.Entries.Where(entry =>
+        (entry.Platform != null && entry.Platform.Contains(keyword)) ||
+        (entry.Username != null && entry.Username.Contains(keyword)) ||
+        (entry.Email != null && entry.Email.Contains(keyword))
+      ).Select(entry => new ExportableDatabaseEntry
+      { // Serialize only id, platform, username, and email
+        Id = entry.Id,
+        Platform = entry.Platform,
+        Username = entry.Username,
+        Email = entry.Email
+      }
+    ).ToList();
+
     public static void Update(string id, DatabaseEntry entry)
     {
       var index = database.Entries.FindIndex(entry => entry.Id == id);
@@ -57,56 +107,13 @@ namespace Passenger
       entry.Created = database.Entries[index].Created; // Preserve created date
       // Update entry in database and save
       database.Entries[index] = entry;
-      Save();
+      SaveToFile();
     }
+
     public static void Delete(string id)
     {
       database.Entries.RemoveAll(entry => entry.Id == id);
-      Save();
-    }
-    public static string GetAll() => JsonSerializer.Serialize(
-      database.Entries.Select(entry => new SerializableDatabaseEntry
-      {
-        Id = entry.Id,
-        Platform = entry.Platform,
-        Username = entry.Username,
-        Email = entry.Email
-      })
-    );
-    public static string Query(string keyword) => JsonSerializer.Serialize(
-      database.Entries.Where(entry =>
-        (entry.Platform != null && entry.Platform.Contains(keyword)) ||
-        (entry.Username != null && entry.Username.Contains(keyword)) ||
-        (entry.Email != null && entry.Email.Contains(keyword))
-      ).Select(entry => new SerializableDatabaseEntry
-      { // Serialize only id, platform, username, and email
-        Id = entry.Id,
-        Platform = entry.Platform,
-        Username = entry.Username,
-        Email = entry.Email
-      }).ToList()
-    );
-    public static string Fetch(string id) => JsonSerializer.Serialize(
-      database.Entries.Find(entry => entry.Id == id)
-    );
-
-    public static string GetPassphrase() => database.Passphrase;
-    public static bool IsRegistered()
-    {
-      if (File.Exists(databaseFile))
-        return database.Passphrase != null;
-      else return false;
-    }
-    public static void Register(string passphrase)
-    {
-      database.Passphrase = passphrase;
-      database.Entries = [];
-      Save();
-    }
-    public static void ResetPassphrase(string newPassphrase)
-    {
-      database.Passphrase = newPassphrase;
-      Save();
+      SaveToFile();
     }
   }
 
@@ -160,7 +167,7 @@ namespace Passenger
     public string Updated { get; set; }
   }
 
-  public class SerializableDatabaseEntry
+  public class ExportableDatabaseEntry
   {
     [JsonPropertyName("id")]
     public string Id { get; set; }

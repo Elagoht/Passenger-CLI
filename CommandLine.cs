@@ -3,19 +3,25 @@ namespace Passenger
   public class CommandLine(string[] args)
   {
     private readonly string command = args[0];
+
     public void Parse()
     {
       if (string.IsNullOrEmpty(command)) Error.MissingCommand();
       Worker worker = new(args);
       switch (command)
       {
-        case "help" or "--help" or "-h": Worker.Help(); break;
         case "login" or "-l": worker.Login(); break;
         case "register" or "-r": worker.Register(); break;
         case "reset" or "-R": worker.Reset(); break;
-        case "get" or "-g": worker.Get(); break;
+        case "create" or "-c": worker.Create(); break;
+        case "fetchAll" or "-a": worker.FetchAll(); break;
+        case "fetch" or "-f": worker.FetchOne(); break;
         case "query" or "-q": worker.Query(); break;
-        case "save" or "-s": worker.Save(); break;
+        case "update" or "-u": worker.Update(); break;
+        case "delete" or "-d": worker.Delete(); break;
+        case "version" or "-v" or "--version": Worker.Version(); break;
+        case "help" or "--help" or "-h": Worker.Help(); break;
+        case "man" or "-m": Worker.Manual(); break;
         default: Error.UnknownCommand(); break;
       }
     }
@@ -34,16 +40,25 @@ namespace Passenger
       AskForHelp();
       Environment.Exit(2);
     }
+
     public static void MissingCommand()
     {
       Console.WriteLine("passenger: missing command");
       Environment.Exit(1);
     }
+
     public static void UnknownCommand()
     {
       Console.WriteLine("passenger: unknown command");
       Environment.Exit(1);
     }
+
+    public static void EntryNotFound()
+    {
+      Console.WriteLine("passenger: entry not found");
+      Environment.Exit(1);
+    }
+
     public static void AskForHelp()
     {
       Console.WriteLine("passenger: try 'passenger --help' for more information");

@@ -111,7 +111,7 @@ namespace Passenger
     // *** Help and manual *** //
     public static void Manual()
     {
-      Console.WriteLine(@"PASSENGER(1)                 Passenger CLI Manual                 PASSENGER(1)
+      Console.WriteLine($@"PASSENGER(1)                 Passenger CLI Manual                 PASSENGER(1)
 
 NAME
       Passenger - Portable and customizable password manager.
@@ -185,7 +185,7 @@ AUTHOR
 SEE ALSO
       jq(1)
 
-0.1.0                              May 2024                       PASSENGER(1)"
+{GlobalConstants.VERSION}                              May 2024                       PASSENGER(1)"
       );
       Environment.Exit(0);
     }

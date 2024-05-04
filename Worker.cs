@@ -51,7 +51,7 @@ namespace Passenger
       if (authorization.ValidateToken(arguments[0]))
       {
         DatabaseEntry entry = JsonSerializer.Deserialize<DatabaseEntry>(arguments[1]);
-        Database.ValidateEntry(entry);
+        Validate.Entry(entry);
         Database.Append(entry);
       }
       else Console.WriteLine("passenger: invalid token");

@@ -36,7 +36,7 @@ namespace Passenger
     }
     public static void Append(DatabaseEntry entry)
     {
-      entry = ValidateEntry(entry);
+      entry = Validate.Entry(entry);
       // Auto-generate id
       entry.Id = Guid.NewGuid().ToString();
       entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -53,7 +53,7 @@ namespace Passenger
         Console.WriteLine("passenger: entry not found");
         Environment.Exit(1);
       }
-      entry = ValidateEntry(entry);
+      entry = Validate.Entry(entry);
       entry.Created = database.Entries[index].Created; // Preserve created date
       // Update entry in database and save
       database.Entries[index] = entry;
@@ -86,25 +86,10 @@ namespace Passenger
         Email = entry.Email
       }).ToList()
     );
-    public static DatabaseEntry Fetch(string id) => database.Entries.Find(entry => entry.Id == id);
-    public static DatabaseEntry ValidateEntry(DatabaseEntry entry)
-    {
-      // Check if at at least email or username is provided
-      if (string.IsNullOrEmpty(entry.Email) && string.IsNullOrEmpty(entry.Username))
-      {
-        Console.WriteLine("passenger: email or username is required");
-        Environment.Exit(1);
-      }
-      // Check if required fields are provided
-      if (string.IsNullOrEmpty(entry.Platform) || string.IsNullOrEmpty(entry.Passphrase))
-      {
-        Console.WriteLine("passenger: platform and passphrase are required");
-        Environment.Exit(1);
-      }
-      // Auto-generate created and updated
-      entry.Updated = entry.Created;
-      return entry;
-    }
+    public static string Fetch(string id) => JsonSerializer.Serialize(
+      database.Entries.Find(entry => entry.Id == id)
+    );
+
     public static string GetPassphrase() => database.Passphrase;
     public static bool IsRegistered()
     {
@@ -122,6 +107,28 @@ namespace Passenger
     {
       database.Passphrase = newPassphrase;
       Save();
+    }
+  }
+
+  public class Validate
+  {
+    public static DatabaseEntry Entry(DatabaseEntry entry)
+    {
+      // Check if at at least email or username is provided
+      if (string.IsNullOrEmpty(entry.Email) && string.IsNullOrEmpty(entry.Username))
+      {
+        Console.WriteLine("passenger: email or username is required");
+        Environment.Exit(1);
+      }
+      // Check if required fields are provided
+      if (string.IsNullOrEmpty(entry.Platform) || string.IsNullOrEmpty(entry.Passphrase))
+      {
+        Console.WriteLine("passenger: platform and passphrase are required");
+        Environment.Exit(1);
+      }
+      // Auto-generate created and updated
+      entry.Updated = entry.Created;
+      return entry;
     }
   }
 

@@ -51,7 +51,11 @@ namespace Passenger
     {
       if (arguments.Length != 1) Error.ArgumentCount("get", 1);
       if (authorization.ValidateToken(arguments[0]))
-        Console.WriteLine(Database.FetchAll());
+        Console.WriteLine(
+          JsonSerializer.Serialize(
+          Database.FetchAll()
+          )
+        );
       else
         Console.WriteLine("passenger: invalid token");
     }

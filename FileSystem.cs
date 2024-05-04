@@ -20,13 +20,11 @@ namespace Passenger
           Environment.Exit(2); break;
       }
     }
-
     public static string Read(string fileName)
     {
       try { return new StreamReader(fileName).ReadToEnd(); }
       catch (Exception exception) { Exceptions(exception); throw; }
     }
-
     public static void Write(string fileName, string data)
     {
       try { new StreamWriter(fileName).Write(data); }

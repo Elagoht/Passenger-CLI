@@ -1,4 +1,3 @@
-
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -11,11 +10,8 @@ namespace Passenger
     {
       try
       {
-        database = JsonSerializer.Deserialize<DatabaseModel>(
-          File.Exists(databaseFile)
-          ? FileSystem.Read(databaseFile)
-          : "{}"
-        );
+        string data = File.Exists(databaseFile) ? FileSystem.Read(databaseFile) : "{}";
+        database = JsonSerializer.Deserialize<DatabaseModel>(data) ?? new DatabaseModel { Entries = new List<DatabaseEntry>() };
       }
       catch
       {
@@ -44,6 +40,7 @@ namespace Passenger
       // Auto-generate id
       entry.Id = Guid.NewGuid().ToString();
       entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+      entry.Updated = entry.Created;
       // Append entry to database and save
       database.Entries.Add(entry);
       Save();
@@ -67,6 +64,29 @@ namespace Passenger
       database.Entries.RemoveAll(entry => entry.Id == id);
       Save();
     }
+    public static string GetAll() => JsonSerializer.Serialize(
+      database.Entries.Select(entry => new SerializableDatabaseEntry
+      {
+        Id = entry.Id,
+        Platform = entry.Platform,
+        Username = entry.Username,
+        Email = entry.Email
+      })
+    );
+    public static string Query(string keyword) => JsonSerializer.Serialize(
+      database.Entries.Where(entry =>
+        (entry.Platform != null && entry.Platform.Contains(keyword)) ||
+        (entry.Username != null && entry.Username.Contains(keyword)) ||
+        (entry.Email != null && entry.Email.Contains(keyword))
+      ).Select(entry => new SerializableDatabaseEntry
+      { // Serialize only id, platform, username, and email
+        Id = entry.Id,
+        Platform = entry.Platform,
+        Username = entry.Username,
+        Email = entry.Email
+      }).ToList()
+    );
+    public static DatabaseEntry Fetch(string id) => database.Entries.Find(entry => entry.Id == id);
     public static DatabaseEntry ValidateEntry(DatabaseEntry entry)
     {
       // Check if at at least email or username is provided
@@ -131,5 +151,17 @@ namespace Passenger
     public string Created { get; set; }
     [JsonPropertyName("updated"), Required] // Auto-generated
     public string Updated { get; set; }
+  }
+
+  public class SerializableDatabaseEntry
+  {
+    [JsonPropertyName("id")]
+    public string Id { get; set; }
+    [JsonPropertyName("platform")]
+    public string Platform { get; set; }
+    [JsonPropertyName("username")]
+    public string Username { get; set; }
+    [JsonPropertyName("email")]
+    public string Email { get; set; }
   }
 }

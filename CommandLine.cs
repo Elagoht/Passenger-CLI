@@ -13,6 +13,9 @@ namespace Passenger
         case "login" or "-l": worker.Login(); break;
         case "register" or "-r": worker.Register(); break;
         case "reset" or "-R": worker.Reset(); break;
+        case "get" or "-g": worker.Get(); break;
+        case "query" or "-q": worker.Query(); break;
+        case "save" or "-s": worker.Save(); break;
         default: Error.UnknownCommand(); break;
       }
     }
@@ -22,14 +25,12 @@ namespace Passenger
   {
     public static void ArgumentCount(string command, int minOrActual, int max = -1)
     {
+      if (minOrActual == 0)
+        Console.WriteLine($"passenger: {command}: takes no arguments");
       if (max == -1)
-      {
         Console.WriteLine($"passenger: {command}: expected exactly {minOrActual} arguments");
-      }
       else
-      {
         Console.WriteLine($"passenger: {command}: expected {minOrActual}-{max} arguments");
-      }
       AskForHelp();
       Environment.Exit(2);
     }

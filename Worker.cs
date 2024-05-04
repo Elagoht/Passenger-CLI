@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace Passenger
 {
   public class Worker(string[] args)
@@ -5,6 +7,55 @@ namespace Passenger
     private readonly Authorization authorization = new(EnDeCoder.JSWSecret);
     private readonly string[] arguments = args.Skip(1).ToArray();
 
+    public void Login()
+    {
+      if (arguments.Length != 1) Error.ArgumentCount("login", 1);
+      Console.WriteLine(authorization.GenerateToken(arguments[0]));
+      Environment.Exit(0);
+    }
+    public void Register()
+    {
+      if (arguments.Length != 1) Error.ArgumentCount("register", 1);
+      if (Database.IsRegistered())
+        Console.WriteLine("passenger: already registered");
+      else
+        Database.Register(arguments[0]);
+    }
+    public void Reset()
+    {
+      if (arguments.Length != 2) Error.ArgumentCount("reset", 2);
+      if (authorization.ValidateToken(arguments[0]))
+        Database.ResetPassphrase(arguments[1]);
+      else
+        Console.WriteLine("passenger: invalid token");
+    }
+    public void Get()
+    {
+      if (arguments.Length != 1) Error.ArgumentCount("get", 1);
+      if (authorization.ValidateToken(arguments[0]))
+        Console.WriteLine(Database.GetAll());
+      else
+        Console.WriteLine("passenger: invalid token");
+    }
+    public void Query()
+    {
+      if (arguments.Length != 2) Error.ArgumentCount("query", 2);
+      if (authorization.ValidateToken(arguments[0]))
+        Console.WriteLine(Database.Query(arguments[1]));
+      else
+        Console.WriteLine("passenger: invalid token");
+    }
+    public void Save()
+    {
+      if (arguments.Length != 2) Error.ArgumentCount("save", 2);
+      if (authorization.ValidateToken(arguments[0]))
+      {
+        DatabaseEntry entry = JsonSerializer.Deserialize<DatabaseEntry>(arguments[1]);
+        Database.ValidateEntry(entry);
+        Database.Append(entry);
+      }
+      else Console.WriteLine("passenger: invalid token");
+    }
     public static void Help()
     {
       Console.Write(@"Passenger CLI 0.1.0
@@ -29,29 +80,6 @@ Commands:
   man       -m                   : show the manual page, if available
 ");
       Environment.Exit(0);
-    }
-
-    public void Login()
-    {
-      if (arguments.Length != 1) Error.ArgumentCount("login", 1);
-      Console.WriteLine(authorization.GenerateToken(arguments[0]));
-      Environment.Exit(0);
-    }
-    public void Register()
-    {
-      if (arguments.Length != 1) Error.ArgumentCount("register", 1);
-      if (Database.IsRegistered())
-        Console.WriteLine("passenger: already registered");
-      else
-        Database.Register(arguments[0]);
-    }
-    public void Reset()
-    {
-      if (arguments.Length != 2) Error.ArgumentCount("reset", 2);
-      if (authorization.ValidateToken(arguments[0]))
-        Database.ResetPassphrase(arguments[1]);
-      else
-        Console.WriteLine("passenger: invalid token");
     }
   }
 }

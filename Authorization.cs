@@ -1,64 +1,65 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using Passenger;
-
-class Authorization(string secretKey)
+namespace Passenger
 {
-  private readonly string _secretKey = secretKey;
-
-  public string GenerateToken(string passphrase)
+  class Authorization(string secretKey)
   {
-    ValidatePassphrase(passphrase);
+    private readonly string _secretKey = secretKey;
 
-    SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(_secretKey));
-    SecurityTokenDescriptor tokenDescriptor = new()
+    public string GenerateToken(string passphrase)
     {
-      IssuedAt = DateTime.UtcNow,
-      Issuer = "passenger-cli",
-      TokenType = "Bearer",
-      Expires = DateTime.UtcNow.AddMinutes(3),
-      SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
-    };
+      ValidatePassphrase(passphrase);
 
-    JwtSecurityTokenHandler tokenHandler = new();
-    SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+      SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(_secretKey));
+      SecurityTokenDescriptor tokenDescriptor = new()
+      {
+        IssuedAt = DateTime.UtcNow,
+        Issuer = "passenger-cli",
+        TokenType = "Bearer",
+        Expires = DateTime.UtcNow.AddMinutes(3),
+        SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
+      };
 
-    return tokenHandler.WriteToken(token);
-  }
+      JwtSecurityTokenHandler tokenHandler = new();
+      SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
 
-  public bool ValidateToken(string token)
-  {
-    TokenValidationParameters validationParameters = new()
-    {
-      ValidateIssuer = true,
-      ValidIssuer = "passenger-cli",
-      ValidateAudience = false,
-      ValidateLifetime = true,
-      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey))
-    };
-
-    JwtSecurityTokenHandler tokenHandler = new();
-    try
-    {
-      tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken); return true;
+      return tokenHandler.WriteToken(token);
     }
-    catch { return false; }
-  }
-  public static bool ValidatePassphrase(string passphrase)
-  {
-    // This is a placeholder for a more complex validation algorithm
-    if (!Database.IsRegistered())
+
+    public bool ValidateToken(string token)
     {
-      Console.WriteLine("passenger: not registered yet");
-      Environment.Exit(1);
+      TokenValidationParameters validationParameters = new()
+      {
+        ValidateIssuer = true,
+        ValidIssuer = "passenger-cli",
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey))
+      };
+
+      JwtSecurityTokenHandler tokenHandler = new();
+      try
+      {
+        tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken); return true;
+      }
+      catch { return false; }
     }
-    string result = Database.GetPassphrase();
-    if (result != passphrase)
+    public static bool ValidatePassphrase(string passphrase)
     {
-      Console.WriteLine("passenger: passphrase could not be validated");
-      Environment.Exit(1);
+      // This is a placeholder for a more complex validation algorithm
+      if (!Database.IsRegistered())
+      {
+        Console.WriteLine("passenger: not registered yet");
+        Environment.Exit(1);
+      }
+      string result = Database.GetPassphrase();
+      if (result != passphrase)
+      {
+        Console.WriteLine("passenger: passphrase could not be validated");
+        Environment.Exit(1);
+      }
+      return true;
     }
-    return true;
   }
 }

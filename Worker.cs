@@ -53,7 +53,7 @@ namespace Passenger
       if (authorization.ValidateToken(arguments[0]))
         Console.WriteLine(
           JsonSerializer.Serialize(
-          Database.FetchAll()
+            Database.FetchAll()
           )
         );
       else

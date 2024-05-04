@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Passenger;
 
 class Authorization(string secretKey)
 {
@@ -47,12 +48,17 @@ class Authorization(string secretKey)
   public static bool ValidatePassphrase(string passphrase)
   {
     // This is a placeholder for a more complex validation algorithm
-    bool result = passphrase == "nobodycanbreakthis";
-    if (!result)
+    if (!Database.IsRegistered())
+    {
+      Console.WriteLine("passenger: not registered yet");
+      Environment.Exit(1);
+    }
+    string result = Database.GetPassphrase();
+    if (result != passphrase)
     {
       Console.WriteLine("passenger: passphrase could not be validated");
       Environment.Exit(1);
     }
-    return result;
+    return true;
   }
 }

@@ -11,10 +11,11 @@ namespace Passenger
     {
       try
       {
-        string data = File.Exists(databaseFile)
+        database = JsonSerializer.Deserialize<DatabaseModel>(
+          File.Exists(databaseFile)
           ? FileSystem.Read(databaseFile)
-          : "{}";
-        database = JsonSerializer.Deserialize<DatabaseModel>(data);
+          : "{}"
+        );
       }
       catch
       {

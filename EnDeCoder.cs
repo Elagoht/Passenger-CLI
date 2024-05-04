@@ -9,14 +9,14 @@ namespace Passenger
     {
       char[] charArray = data.ToCharArray();
       Array.Reverse(charArray);
-      return new string(charArray) + "==";
+      return new string(charArray);
     }
 
     public static string Decode(string data)
     {
       char[] charArray = data.ToCharArray();
       Array.Reverse(charArray);
-      return new string(charArray)[..(data.Length - 2)];
+      return new string(charArray);
     }
   }
 }

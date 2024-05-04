@@ -26,7 +26,6 @@ Commands:
   help      -h --help            : show this help message and exit
   man       -m                   : show the manual page, if available
 ";
-
     public void Parse()
     {
       if (string.IsNullOrEmpty(command)) Error.MissingCommand();
@@ -39,22 +38,15 @@ Commands:
         default: Error.UnknownCommand(); break;
       }
     }
-
-    private void Help()
-    {
-      Console.Write(helpText);
-    }
-
+    // Commands
+    private void Help() => Console.Write(helpText);
     private void Login()
     {
       if (arguments.Length != 1)
-      {
         Error.ArgumentCount("login", 1);
-      }
       Console.WriteLine(authorization.GenerateToken(arguments[0]));
       Environment.Exit(0);
     }
-
     private void Register()
     {
       if (arguments.Length < 2) Error.ArgumentCount("register", 1);
@@ -76,7 +68,6 @@ Commands:
       AskForHelp();
       Environment.Exit(2);
     }
-
     public static void MissingCommand()
     {
       Console.WriteLine("passenger: missing command");

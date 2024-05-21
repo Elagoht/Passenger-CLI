@@ -11,7 +11,7 @@ namespace Passenger
       try
       {
         string data = File.Exists(databaseFile) ? FileSystem.Read(databaseFile) : "{}";
-        database = JsonSerializer.Deserialize<DatabaseModel>(data) ?? new DatabaseModel { Entries = new List<DatabaseEntry>() };
+        database = JsonSerializer.Deserialize<DatabaseModel>(data) ?? new DatabaseModel { Entries = [] };
       }
       catch
       {
@@ -75,7 +75,8 @@ namespace Passenger
         Id = entry.Id,
         Platform = entry.Platform,
         Username = entry.Username,
-        Email = entry.Email
+        Email = entry.Email,
+        Url = entry.Url
       }
     ).ToList();
 
@@ -91,7 +92,8 @@ namespace Passenger
         Id = entry.Id,
         Platform = entry.Platform,
         Username = entry.Username,
-        Email = entry.Email
+        Email = entry.Email,
+        Url = entry.Url
       }
     ).ToList();
 
@@ -127,7 +129,11 @@ namespace Passenger
         Environment.Exit(1);
       }
       // Check if required fields are provided
-      if (string.IsNullOrEmpty(entry.Platform) || string.IsNullOrEmpty(entry.Passphrase))
+      if (
+        string.IsNullOrEmpty(entry.Platform) ||
+        string.IsNullOrEmpty(entry.Passphrase) ||
+        string.IsNullOrEmpty(entry.Url)
+      )
       {
         Console.WriteLine("passenger: platform and passphrase are required");
         Environment.Exit(1);
@@ -152,6 +158,8 @@ namespace Passenger
     public string Id { get; set; }
     [JsonPropertyName("platform"), Required] // Required
     public string Platform { get; set; }
+    [JsonPropertyName("url"), Required] // Required
+    public string Url { get; set; }
     [JsonPropertyName("username")] // Required if email is not provided
     public string Username { get; set; }
     [JsonPropertyName("email")] // Required if username is not provided
@@ -172,6 +180,8 @@ namespace Passenger
     public string Id { get; set; }
     [JsonPropertyName("platform")]
     public string Platform { get; set; }
+    [JsonPropertyName("url")]
+    public string Url { get; set; }
     [JsonPropertyName("username")]
     public string Username { get; set; }
     [JsonPropertyName("email")]

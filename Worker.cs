@@ -30,7 +30,7 @@ namespace Passenger
       if (authorization.ValidateToken(arguments[0]))
         Database.ResetPassphrase(arguments[1]);
       else
-        Console.WriteLine("passenger: invalid token");
+        Error.InvalidToken();
     }
 
     // *** CRUD operations *** //
@@ -43,7 +43,7 @@ namespace Passenger
         Validate.Entry(entry);
         Database.Create(entry);
       }
-      else Console.WriteLine("passenger: invalid token");
+      else Error.InvalidToken();
     }
 
     public void FetchAll()
@@ -56,7 +56,7 @@ namespace Passenger
           )
         );
       else
-        Console.WriteLine("passenger: invalid token");
+        Error.InvalidToken();
     }
 
     public void FetchOne()
@@ -69,7 +69,7 @@ namespace Passenger
           )
         );
       else
-        Console.WriteLine("passenger: invalid token");
+        Error.InvalidToken();
     }
 
     public void Query()
@@ -82,7 +82,7 @@ namespace Passenger
           )
         );
       else
-        Console.WriteLine("passenger: invalid token");
+        Error.InvalidToken();
     }
 
     public void Update()
@@ -95,7 +95,7 @@ namespace Passenger
         Database.Update(arguments[1], entry);
       }
       else
-        Console.WriteLine("passenger: invalid token");
+        Error.InvalidToken();
     }
 
     public void Delete()
@@ -104,7 +104,7 @@ namespace Passenger
       if (authorization.ValidateToken(arguments[0]))
         Database.Delete(arguments[1]);
       else
-        Console.WriteLine("passenger: invalid token");
+        Error.InvalidToken();
     }
 
     // *** Help and manual *** //

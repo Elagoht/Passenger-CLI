@@ -53,6 +53,12 @@ namespace Passenger
       Environment.Exit(1);
     }
 
+    public static void InvalidToken()
+    {
+      Console.WriteLine("passenger: invalid token");
+      Environment.Exit(1);
+    }
+
     public static void EntryNotFound()
     {
       Console.WriteLine("passenger: entry not found");

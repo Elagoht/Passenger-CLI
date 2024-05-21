@@ -59,6 +59,12 @@ namespace Passenger
       Environment.Exit(1);
     }
 
+    public static void MissingField(string field)
+    {
+      Console.WriteLine($"passenger: missing field '{field}'");
+      Environment.Exit(1);
+    }
+
     public static void EntryNotFound()
     {
       Console.WriteLine("passenger: entry not found");

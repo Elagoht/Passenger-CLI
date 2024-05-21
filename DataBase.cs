@@ -69,13 +69,12 @@ namespace Passenger
       SaveToFile();
     }
 
-    public static List<ExportableDatabaseEntry> FetchAll() => database.Entries.Select(entry =>
-      new ExportableDatabaseEntry
+    public static List<ListableDatabaseEntry> FetchAll() => database.Entries.Select(entry =>
+      new ListableDatabaseEntry
       {
         Id = entry.Id,
         Platform = entry.Platform,
-        Username = entry.Username,
-        Email = entry.Email,
+        Idendity = entry.Identity,
         Url = entry.Url
       }
     ).ToList();
@@ -83,16 +82,15 @@ namespace Passenger
     public static DatabaseEntry FetchOne(string id) => database.Entries
       .Find(entry => entry.Id == id);
 
-    public static List<ExportableDatabaseEntry> Query(string keyword) => database.Entries.Where(entry =>
+    public static List<ListableDatabaseEntry> Query(string keyword) => database.Entries.Where(entry =>
         (entry.Platform != null && entry.Platform.Contains(keyword)) ||
-        (entry.Username != null && entry.Username.Contains(keyword)) ||
-        (entry.Email != null && entry.Email.Contains(keyword))
-      ).Select(entry => new ExportableDatabaseEntry
-      { // Serialize only id, platform, username, and email
+        (entry.Identity != null && entry.Identity.Contains(keyword)) ||
+        (entry.Url != null && entry.Url.Contains(keyword))
+      ).Select(entry => new ListableDatabaseEntry
+      {
         Id = entry.Id,
         Platform = entry.Platform,
-        Username = entry.Username,
-        Email = entry.Email,
+        Idendity = entry.Identity,
         Url = entry.Url
       }
     ).ToList();
@@ -122,20 +120,12 @@ namespace Passenger
   {
     public static DatabaseEntry Entry(DatabaseEntry entry)
     {
-      // Check if at at least email or username is provided
-      if (string.IsNullOrEmpty(entry.Email) && string.IsNullOrEmpty(entry.Username))
-      {
-        Console.WriteLine("passenger: email or username is required");
-        Environment.Exit(1);
-      }
       // Check if required fields are provided
-      if (
-        string.IsNullOrEmpty(entry.Platform) ||
-        string.IsNullOrEmpty(entry.Passphrase) ||
-        string.IsNullOrEmpty(entry.Url)
-      )
+      if (string.IsNullOrEmpty(entry.Platform)) Error.MissingField("platform");
+      if (string.IsNullOrEmpty(entry.Passphrase)) Error.MissingField("passphrase");
+      if (string.IsNullOrEmpty(entry.Url)) Error.MissingField("url");
+      if (string.IsNullOrEmpty(entry.Identity)) Error.MissingField("identity");
       {
-        Console.WriteLine("passenger: platform and passphrase are required");
         Environment.Exit(1);
       }
       // Auto-generate created and updated
@@ -156,15 +146,13 @@ namespace Passenger
   {
     [JsonPropertyName("id"), Required] // Auto-generated
     public string Id { get; set; }
-    [JsonPropertyName("platform"), Required] // Required
+    [JsonPropertyName("platform"), Required]
     public string Platform { get; set; }
-    [JsonPropertyName("url"), Required] // Required
+    [JsonPropertyName("url"), Required]
     public string Url { get; set; }
-    [JsonPropertyName("username")] // Required if email is not provided
-    public string Username { get; set; }
-    [JsonPropertyName("email")] // Required if username is not provided
-    public string Email { get; set; }
-    [JsonPropertyName("passphrase"), Required] // Required
+    [JsonPropertyName("identity"), Required]
+    public string Identity { get; set; }
+    [JsonPropertyName("passphrase"), Required]
     public string Passphrase { get; set; }
     [JsonPropertyName("notes")] // Optional
     public string Notes { get; set; }
@@ -174,17 +162,15 @@ namespace Passenger
     public string Updated { get; set; }
   }
 
-  public class ExportableDatabaseEntry
+  public class ListableDatabaseEntry
   {
-    [JsonPropertyName("id")]
+    [JsonPropertyName("id"), Required]
     public string Id { get; set; }
-    [JsonPropertyName("platform")]
+    [JsonPropertyName("platform"), Required]
     public string Platform { get; set; }
-    [JsonPropertyName("url")]
+    [JsonPropertyName("identity"), Required]
+    public string Idendity { get; set; }
+    [JsonPropertyName("url"), Required]
     public string Url { get; set; }
-    [JsonPropertyName("username")]
-    public string Username { get; set; }
-    [JsonPropertyName("email")]
-    public string Email { get; set; }
   }
 }

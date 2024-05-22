@@ -211,11 +211,11 @@ COMMANDS
       login -l
             Generate a JWT token to use other commands. Requires a
             passphrase.
-            passenger login -l [passphrase]
+            passenger login -l [username] [passphrase]
 
       register -r
             Register a passphrase to the Passenger client.
-            passenger register [passphrase]
+            passenger register [username] [passphrase]
 
       reset -R
             Reset the passphrase of the Passenger client using a JWT token
@@ -236,7 +236,7 @@ COMMANDS
             passenger fetch [jwt] [uuid]
 
       create -c
-            Store an entry with the given data, requires a JWT token.
+            Store an entry with the given json, requires a JWT token.
             passenger create [jwt] [json]
 
       update -u

@@ -338,6 +338,12 @@ namespace Passenger
     public string Url { get; set; }
   }
 
+  /// <summary>
+  /// Credentials Object
+  /// </summary>
+  /// <remarks>
+  /// This class defines the structure of a credentials object.
+  /// </remarks>
   public class Credentials
   {
     public string Username { get; set; }

@@ -22,9 +22,9 @@ namespace Passenger
     /// <remarks>
     /// This method generates a JWT token with the provided passphrase. This token is required to use other commands via command line.
     /// </remarks>
-    public string GenerateToken(string passphrase)
+    public string GenerateToken(string username, string passphrase)
     {
-      ValidatePassphrase(passphrase);
+      ValidatePassphrase(username, passphrase);
 
       SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(_secretKey));
       SecurityTokenDescriptor tokenDescriptor = new()
@@ -32,7 +32,7 @@ namespace Passenger
         IssuedAt = DateTime.UtcNow,
         Issuer = "passenger-cli",
         TokenType = "Bearer",
-        Expires = DateTime.UtcNow.AddMinutes(3),
+        Expires = DateTime.UtcNow.AddMinutes(10),
         SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
       };
 
@@ -77,7 +77,7 @@ namespace Passenger
     /// <remarks>
     /// This method validates a passphrase.
     /// </remarks>
-    public static bool ValidatePassphrase(string passphrase)
+    public static bool ValidatePassphrase(string username, string passphrase)
     {
       // This is a placeholder for a more complex validation algorithm
       if (!Database.IsRegistered())
@@ -85,8 +85,10 @@ namespace Passenger
         Console.WriteLine("passenger: not registered yet");
         Environment.Exit(1);
       }
-      string result = Database.GetPassphrase();
-      if (result != passphrase)
+      string passphraseOnDB = Database.GetCredentials().Passphrase;
+      string usernameOnDB = Database.GetCredentials().Username;
+
+      if (passphraseOnDB != passphrase || usernameOnDB != username)
       {
         Console.WriteLine("passenger: passphrase could not be validated");
         Environment.Exit(1);

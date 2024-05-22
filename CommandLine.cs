@@ -136,6 +136,12 @@ namespace Passenger
       Environment.Exit(1);
     }
 
+    public static void JsonParseError()
+    {
+      Console.WriteLine("passenger: JSON parse error");
+      Environment.Exit(1);
+    }
+
     /// <summary>
     /// Ask for help
     /// </summary>

@@ -12,13 +12,13 @@ is a command line password manager designed to be portable and customizable. It 
 .BR login " \-l"
 Generate a JWT token to use other commands. Requires a passphrase.
 .RS
-.B passenger login \-l [passphrase]
+.B passenger login \-l [username] [passphrase]
 .RE
 .TP
 .BR register " \-r"
 Register a passphrase to the Passenger client.
 .RS
-.B passenger register [passphrase]
+.B passenger register [username] [passphrase]
 .RE
 .TP
 .BR reset " \-R"
@@ -46,13 +46,13 @@ Retrieve an entry by its UUID, requires a JWT token.
 .RE
 .TP
 .BR create " \-c"
-Store an entry with the given data, requires a JWT token.
+Store an entry with the given json, requires a JWT token.
 .RS
-.B passenger create [jwt] [data]
+.B passenger create [jwt] [json]
 .RE
 .TP
 .BR update " \-u"
-Update an entry by its UUID, requires a JWT token and JSON formatted data.
+Update an entry by its UUID, requires a JWT token and JSON formatted json.
 .RS
 .B passenger update [jwt] [uuid] [json]
 .RE

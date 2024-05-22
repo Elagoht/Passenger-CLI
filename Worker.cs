@@ -79,6 +79,7 @@ namespace Passenger
       {
         DatabaseEntry entry = JsonSerializer.Deserialize<DatabaseEntry>(arguments[1]);
         Validate.Entry(entry);
+        entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         Database.Create(entry);
       }
       else Error.InvalidToken();

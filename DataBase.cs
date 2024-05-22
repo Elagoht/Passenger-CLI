@@ -241,11 +241,8 @@ namespace Passenger
       if (string.IsNullOrEmpty(entry.Passphrase)) Error.MissingField("passphrase");
       if (string.IsNullOrEmpty(entry.Url)) Error.MissingField("url");
       if (string.IsNullOrEmpty(entry.Identity)) Error.MissingField("identity");
-      {
-        Environment.Exit(1);
-      }
-      // Auto-generate created and updated
-      entry.Updated = entry.Created;
+      // Update the updated field
+      entry.Updated = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
       return entry;
     }
   }

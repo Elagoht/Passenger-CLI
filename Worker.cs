@@ -26,8 +26,8 @@ namespace Passenger
     /// </remarks>
     public void Login()
     {
-      if (arguments.Length != 1) Error.ArgumentCount("login", 1);
-      Console.WriteLine(authorization.GenerateToken(arguments[0]));
+      if (arguments.Length != 2) Error.ArgumentCount("login", 2);
+      Console.WriteLine(authorization.GenerateToken(arguments[0], arguments[1]));
       Environment.Exit(0);
     }
 
@@ -39,11 +39,11 @@ namespace Passenger
     /// </remarks>
     public void Register()
     {
-      if (arguments.Length != 1) Error.ArgumentCount("register", 1);
+      if (arguments.Length != 2) Error.ArgumentCount("register", 2);
       if (Database.IsRegistered())
         Console.WriteLine("passenger: already registered");
       else
-        Database.Register(arguments[0]);
+        Database.Register(arguments[0], arguments[1]);
     }
 
     /// <summary>
@@ -236,11 +236,11 @@ COMMANDS
 
       create -c
             Store an entry with the given data, requires a JWT token.
-            passenger create [jwt] [data]
+            passenger create [jwt] [json]
 
       update -u
             Update an entry by its UUID, requires a JWT token and JSON
-            formatted data.
+            formatted json.
             passenger update [jwt] [uuid] [json]
 
       delete -d
@@ -286,18 +286,18 @@ Usage:
   passenger [command] [*args]
 
 Commands:
-  login     -l [passphrase]        : generate a JWT token to use other commands
-  register  -r [passphrase]        : register a passphrase to the passenger client
-  reset     -R [jwt] [new]         : reset the passphrase of the passenger client
-  fetchAll  -a [jwt]               : list all entries without their passphrases
-  query     -q [jwt] [keyword]     : list search results without their passphrases
-  fetch     -f [jwt] [uuid]        : retrieve an entry by its uuid with its passphrase
-  create    -c [jwt] [data]        : store an entry with the given data
-  update    -u [jwt] [uuid] [json] : update an entry by its uuid
-  delete    -d [jwt] [uuid]        : delete an entry by its index
-  version   -v --version           : show the version and exit
-  help      -h --help              : show this help message and exit
-  man       -m                     : show the manual page, if available
+  login     -l [username] [passphrase] : generate a JWT token to use other commands
+  register  -r [username] [passphrase] : register a passphrase to the passenger client
+  reset     -R [jwt] [new]             : reset the passphrase of the passenger client
+  fetchAll  -a [jwt]                   : list all entries without their passphrases
+  query     -q [jwt] [keyword]         : list search results without their passphrases
+  fetch     -f [jwt] [uuid]            : retrieve an entry by its uuid with its passphrase
+  create    -c [jwt] [json]            : store an entry with the given json
+  update    -u [jwt] [uuid] [json]     : update an entry by its uuid
+  delete    -d [jwt] [uuid]            : delete an entry by its index
+  version   -v --version               : show the version and exit
+  help      -h --help                  : show this help message and exit
+  man       -m                         : show the manual page, if available
 ");
       Environment.Exit(0);
     }

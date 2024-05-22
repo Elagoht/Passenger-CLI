@@ -26,7 +26,10 @@ namespace Passenger
       }
     }
 
-    // *** Database file *** //
+    /*
+     * Database file
+     */
+
     private static readonly string databaseFile = "./passenger.bus";
     private static readonly DatabaseModel database;
 
@@ -61,7 +64,11 @@ namespace Passenger
     /// <remarks>
     /// This method returns the passphrase stored in the database.
     /// </remarks>
-    public static string GetPassphrase() => database.Passphrase;
+    public static Credentials GetCredentials() => new()
+    {
+      Username = database.Username,
+      Passphrase = database.Passphrase
+    };
 
     /// <summary>
     /// Check if registered
@@ -70,7 +77,9 @@ namespace Passenger
     /// <remarks>
     /// This method checks if the database has a passphrase.
     /// </remarks>
-    public static bool IsRegistered() => !string.IsNullOrEmpty(database.Passphrase);
+    public static bool IsRegistered() =>
+      !string.IsNullOrEmpty(database.Passphrase) &&
+      !string.IsNullOrEmpty(database.Username);
 
     /// <summary>
     /// Register
@@ -79,9 +88,10 @@ namespace Passenger
     /// <remarks>
     /// This method registers a passphrase in the database.
     /// </remarks>
-    public static void Register(string passphrase)
+    public static void Register(string username, string passphrase)
     {
       database.Passphrase = passphrase;
+      database.Username = username;
       database.Entries = [];
       SaveToFile();
     }
@@ -248,8 +258,28 @@ namespace Passenger
   /// </remarks>
   public class DatabaseModel
   {
+
+    /// <summary>
+    /// Username to access the database
+    /// </summary>
+    /// <remarks>
+    /// This should be the same as the
+    /// username on keyring to be used
+    /// to protect the secret key of 
+    /// AES GCM encryption.
+    /// Secret key will be gathered 
+    /// from an environment variable.
+    /// </remarks>
+    [JsonPropertyName("username")]
+    public string Username { get; set; }
+    /// <summary>
+    /// Passphrase to access the database
+    /// </summary>
     [JsonPropertyName("passphrase")]
     public string Passphrase { get; set; }
+    /// <summary>
+    /// A list of passphrases in the database
+    /// </summary>
     [JsonPropertyName("entries")]
     public List<DatabaseEntry> Entries { get; set; }
   }
@@ -296,5 +326,11 @@ namespace Passenger
     public string Idendity { get; set; }
     [JsonPropertyName("url"), Required]
     public string Url { get; set; }
+  }
+
+  public class Credentials
+  {
+    public string Username { get; set; }
+    public string Passphrase { get; set; }
   }
 }

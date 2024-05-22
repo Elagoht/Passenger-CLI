@@ -245,6 +245,19 @@ namespace Passenger
       entry.Updated = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
       return entry;
     }
+
+    /// <summary>
+    /// Validate JSON as database entry
+    /// </summary>
+    /// <param name="json">JSON string</param>
+    /// <remarks>
+    /// Validates and parses a JSON string as a database entry else exits the program with an error.
+    /// </remarks>
+    public static DatabaseEntry JsonAsDatabaseEntry(string json)
+    {
+      try { return JsonSerializer.Deserialize<DatabaseEntry>(json); }
+      catch { Error.JsonParseError(); return null; }
+    }
   }
 
   /// <summary>

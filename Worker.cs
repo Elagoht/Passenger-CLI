@@ -77,7 +77,7 @@ namespace Passenger
       if (arguments.Length != 2) Error.ArgumentCount("save", 2);
       if (authorization.ValidateToken(arguments[0]))
       {
-        DatabaseEntry entry = JsonSerializer.Deserialize<DatabaseEntry>(arguments[1]);
+        DatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[1]);
         Validate.Entry(entry);
         entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         Database.Create(entry);
@@ -156,7 +156,7 @@ namespace Passenger
       if (arguments.Length != 3) Error.ArgumentCount("update", 3);
       if (authorization.ValidateToken(arguments[0]))
       {
-        DatabaseEntry entry = JsonSerializer.Deserialize<DatabaseEntry>(arguments[2]);
+        DatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[2]);
         Validate.Entry(entry);
         Database.Update(arguments[1], entry);
       }

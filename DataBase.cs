@@ -121,7 +121,7 @@ namespace Passenger
     /// <remarks>
     /// This method creates a new entry in the database.
     /// </remarks>
-    public static void Create(DatabaseEntry entry)
+    public static string Create(DatabaseEntry entry)
     {
       entry = Validate.Entry(entry);
       // Auto-generate id
@@ -131,6 +131,7 @@ namespace Passenger
       // Append entry to database and save
       database.Entries.Add(entry);
       SaveToFile();
+      return JsonSerializer.Serialize(entry);
     }
 
     /// <summary>

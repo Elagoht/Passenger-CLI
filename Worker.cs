@@ -14,6 +14,18 @@ namespace Passenger
     private readonly Authorization authorization = new(EnDeCoder.JSWSecret);
     private readonly string[] arguments = args.Skip(1).ToArray();
 
+    /// <summary>
+    /// Verb control routine
+    /// </summary>
+    /// <remarks>
+    /// This method is responsible for controlling the verbs and their respective methods.
+    /// </remarks>
+    private void RoutineAuthControl(string verbName, int requiredArgs)
+    {
+      if (arguments.Length != requiredArgs) Error.ArgumentCount(verbName, requiredArgs);
+      if (!authorization.ValidateToken(arguments[0])) Error.InvalidToken();
+    }
+
     /*
      * Authorization
      */
@@ -54,11 +66,8 @@ namespace Passenger
     /// </remarks>
     public void Reset()
     {
-      if (arguments.Length != 2) Error.ArgumentCount("reset", 2);
-      if (authorization.ValidateToken(arguments[0]))
-        Database.ResetPassphrase(arguments[1]);
-      else
-        Error.InvalidToken();
+      RoutineAuthControl("reset", 2);
+      Database.ResetPassphrase(arguments[1]);
     }
 
     /*
@@ -74,15 +83,11 @@ namespace Passenger
     /// </remarks>
     public void Create()
     {
-      if (arguments.Length != 2) Error.ArgumentCount("save", 2);
-      if (authorization.ValidateToken(arguments[0]))
-      {
-        DatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[1]);
-        Validate.Entry(entry);
-        entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        Console.WriteLine(Database.Create(entry));
-      }
-      else Error.InvalidToken();
+      RoutineAuthControl("create", 2);
+      DatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[1]);
+      Validate.Entry(entry);
+      entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+      Console.WriteLine(Database.Create(entry)); ;
     }
 
     /// <summary>
@@ -94,15 +99,11 @@ namespace Passenger
     /// </remarks>
     public void FetchAll()
     {
-      if (arguments.Length != 1) Error.ArgumentCount("get", 1);
-      if (authorization.ValidateToken(arguments[0]))
-        Console.WriteLine(
-          JsonSerializer.Serialize(
-            Database.FetchAll()
-          )
-        );
-      else
-        Error.InvalidToken();
+      RoutineAuthControl("fetchAll", 1);
+      Console.WriteLine(
+        JsonSerializer.Serialize(Database.FetchAll()
+        )
+      );
     }
 
     /// <summary>
@@ -112,17 +113,14 @@ namespace Passenger
     /// <remarks>
     /// Retrieve an entry by its UUID, requires a JWT token.
     /// </remarks>
-    public void FetchOne()
+    public void Fetch()
     {
-      if (arguments.Length != 2) Error.ArgumentCount("fetch", 2);
-      if (authorization.ValidateToken(arguments[0]))
-        Console.WriteLine(
-          JsonSerializer.Serialize(
-            Database.FetchOne(arguments[1])
-          )
-        );
-      else
-        Error.InvalidToken();
+      RoutineAuthControl("fetch", 2);
+      Console.WriteLine(
+        JsonSerializer.Serialize(
+          Database.FetchOne(arguments[1])
+        )
+      );
     }
 
     /// <summary>
@@ -134,15 +132,12 @@ namespace Passenger
     /// </remarks>
     public void Query()
     {
-      if (arguments.Length != 2) Error.ArgumentCount("query", 2);
-      if (authorization.ValidateToken(arguments[0]))
-        Console.WriteLine(
-          JsonSerializer.Serialize(
-            Database.Query(arguments[1])
-          )
-        );
-      else
-        Error.InvalidToken();
+      RoutineAuthControl("query", 2);
+      Console.WriteLine(
+        JsonSerializer.Serialize(
+          Database.Query(arguments[1])
+        )
+      );
     }
 
     /// <summary>
@@ -153,15 +148,10 @@ namespace Passenger
     /// </remarks>
     public void Update()
     {
-      if (arguments.Length != 3) Error.ArgumentCount("update", 3);
-      if (authorization.ValidateToken(arguments[0]))
-      {
-        DatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[2]);
-        Validate.Entry(entry);
-        Database.Update(arguments[1], entry);
-      }
-      else
-        Error.InvalidToken();
+      RoutineAuthControl("update", 3);
+      DatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[2]);
+      Validate.Entry(entry);
+      Database.Update(arguments[1], entry);
     }
 
     /// <summary>
@@ -172,11 +162,8 @@ namespace Passenger
     /// </remarks>
     public void Delete()
     {
-      if (arguments.Length != 2) Error.ArgumentCount("delete", 2);
-      if (authorization.ValidateToken(arguments[0]))
-        Database.Delete(arguments[1]);
-      else
-        Error.InvalidToken();
+      RoutineAuthControl("delete", 2);
+      Database.Delete(arguments[1]);
     }
 
     /*

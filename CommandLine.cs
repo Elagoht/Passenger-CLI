@@ -34,7 +34,7 @@ namespace Passenger
         case "reset" or "-R": worker.Reset(); break;
         case "create" or "-c": worker.Create(); break;
         case "fetchAll" or "-a": worker.FetchAll(); break;
-        case "fetch" or "-f": worker.FetchOne(); break;
+        case "fetch" or "-f": worker.Fetch(); break;
         case "query" or "-q": worker.Query(); break;
         case "update" or "-u": worker.Update(); break;
         case "delete" or "-d": worker.Delete(); break;

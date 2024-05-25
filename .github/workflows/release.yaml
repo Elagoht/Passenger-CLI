@@ -1,0 +1,178 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        architecture: [x64, arm64]
+        include:
+          - os: ubuntu-latest
+            rid: linux-x64
+            architecture: x64
+          - os: ubuntu-latest
+            rid: linux-arm64
+            architecture: arm64
+          - os: windows-latest
+            rid: win-x64
+            architecture: x64
+          - os: windows-latest
+            rid: win-arm64
+            architecture: arm64
+          - os: macos-latest
+            rid: osx-x64
+            architecture: x64
+          - os: macos-latest
+            rid: osx-arm64
+            architecture: arm64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --runtime ${{ matrix.rid }} --self-contained
+
+      - name: Publish
+        run: dotnet publish --configuration Release --runtime ${{ matrix.rid }} --self-contained --output ./publish
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.os }}-${{ matrix.architecture }}-artifact
+          path: ./publish
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download artifacts (Linux x64)
+        uses: actions/download-artifact@v2
+        with:
+          name: ubuntu-latest-x64-artifact
+          path: ./artifacts/linux-x64
+
+      - name: Download artifacts (Linux ARM64)
+        uses: actions/download-artifact@v2
+        with:
+          name: ubuntu-latest-arm64-artifact
+          path: ./artifacts/linux-arm64
+
+      - name: Download artifacts (Windows x64)
+        uses: actions/download-artifact@v2
+        with:
+          name: windows-latest-x64-artifact
+          path: ./artifacts/windows-x64
+
+      - name: Download artifacts (Windows ARM64)
+        uses: actions/download-artifact@v2
+        with:
+          name: windows-latest-arm64-artifact
+          path: ./artifacts/windows-arm64
+
+      - name: Download artifacts (macOS x64)
+        uses: actions/download-artifact@v2
+        with:
+          name: macos-latest-x64-artifact
+          path: ./artifacts/macos-x64
+
+      - name: Download artifacts (macOS ARM64)
+        uses: actions/download-artifact@v2
+        with:
+          name: macos-latest-arm64-artifact
+          path: ./artifacts/macos-arm64
+
+      - name: Determine if Pre-release
+        id: prerelease_check
+        run: echo "::set-output name=prerelease::$(echo ${{ github.ref }} | grep -E -q 'v[0-9]+\.[0-9]+\.[0-9]+-[a-zA-Z0-9]+' && echo true || echo false)"
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: ${{ steps.prerelease_check.outputs.prerelease }}
+          body: |
+            ### Description
+            Release for ${{ github.ref }}
+
+      - name: Upload Release Asset (Linux x64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/linux-x64
+          asset_name: linux-x64.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Asset (Linux ARM64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/linux-arm64
+          asset_name: linux-arm64.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Asset (Windows x64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/windows-x64
+          asset_name: windows-x64.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Asset (Windows ARM64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/windows-arm64
+          asset_name: windows-arm64.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Asset (macOS x64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/macos-x64
+          asset_name: osx-x64.zip
+          asset_content_type: application/zip
+
+      - name: Upload Release Asset (macOS ARM64)
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/macos-arm64
+          asset_name: osx-arm64.zip
+          asset_content_type: application/zip

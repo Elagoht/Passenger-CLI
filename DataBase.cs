@@ -315,6 +315,8 @@ namespace Passenger
     public string Created { get; set; }
     [JsonPropertyName("updated"), Required] // Auto-generated
     public string Updated { get; set; }
+    [JsonPropertyName("totalAccesses")] // Auto-generated
+    public int TotalAccesses { get; set; }
   }
 
   /// <summary>

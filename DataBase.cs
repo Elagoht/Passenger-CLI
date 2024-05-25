@@ -194,15 +194,17 @@ namespace Passenger
     /// <remarks>
     /// This method updates an entry in the database.
     /// </remarks>
-    public static void Update(string id, DatabaseEntry entry)
+    public static void Update(string id, DatabaseEntry entry, bool preserveUpdated = true)
     {
       var index = database.Entries.FindIndex(entry => entry.Id == id);
       if (index == -1) Error.EntryNotFound();
       entry = Validate.Entry(entry);
 
-      entry.Id = database.Entries[index].Id; // Preserve id
-      entry.Created = database.Entries[index].Created; // Preserve created date
-      entry.Updated = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+      entry.Id = database.Entries[index].Id; // Protect id being updated
+      entry.Created = database.Entries[index].Created; // Protect created date before updating
+      entry.Updated = !preserveUpdated // Preserve updated date if wanted
+        ? entry.Updated
+        : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
       // Update entry in database and save
       database.Entries[index] = entry;
       SaveToFile();
@@ -245,8 +247,6 @@ namespace Passenger
       if (string.IsNullOrEmpty(entry.Passphrase)) Error.MissingField("passphrase");
       if (string.IsNullOrEmpty(entry.Url)) Error.MissingField("url");
       if (string.IsNullOrEmpty(entry.Identity)) Error.MissingField("identity");
-      // Update the updated field
-      entry.Updated = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
       return entry;
     }
 

@@ -87,7 +87,7 @@ namespace Passenger
       DatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[1]);
       Validate.Entry(entry);
       entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-      Console.WriteLine(Database.Create(entry)); ;
+      Console.WriteLine(Database.Create(entry));
     }
 
     /// <summary>

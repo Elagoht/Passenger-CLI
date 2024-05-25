@@ -45,7 +45,7 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --configuration Release --runtime ${{ matrix.rid }} --self-contained
+        run: dotnet build Passenger.csproj --configuration Release --runtime ${{ matrix.rid }} --self-contained
 
       - name: Publish
         run: dotnet publish --configuration Release --runtime ${{ matrix.rid }} --self-contained --output ./publish

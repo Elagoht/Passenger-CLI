@@ -53,11 +53,17 @@ jobs:
       - name: Publish
         run: dotnet publish --configuration Release --runtime ${{ matrix.rid }} --self-contained --output ./publish
 
-      - name: Zip published files
+      - name: Zip published files (Linux and macOS)
+        if: runner.os != 'Windows'
         run: |
           cd publish
           zip -r ../${{ matrix.os }}-${{ matrix.architecture }}-artifact.zip .
         shell: bash
+
+      - name: Zip published files (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          powershell Compress-Archive -Path publish\* -DestinationPath ${{ matrix.os }}-${{ matrix.architecture }}-artifact.zip
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2

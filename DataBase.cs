@@ -147,7 +147,10 @@ namespace Passenger
         Id = entry.Id,
         Platform = entry.Platform,
         Identity = entry.Identity,
-        Url = entry.Url
+        Url = entry.Url,
+        Created = entry.Created,
+        Updated = entry.Updated,
+        TotalAccesses = entry.TotalAccesses
       }
     ).ToList();
 

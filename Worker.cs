@@ -101,8 +101,7 @@ namespace Passenger
     {
       RoutineAuthControl("fetchAll", 1);
       Console.WriteLine(
-        JsonSerializer.Serialize(Database.FetchAll()
-        )
+        JsonSerializer.Serialize(Database.FetchAll())
       );
     }
 
@@ -111,14 +110,16 @@ namespace Passenger
     /// </summary>
     /// <returns>DatabaseEntry</returns>
     /// <remarks>
-    /// Retrieve an entry by its UUID, requires a JWT token.
+    /// Retrieve an entry by its UUID and increment its total accesses, requires a JWT token.
     /// </remarks>
     public void Fetch()
     {
       RoutineAuthControl("fetch", 2);
-      var entry = JsonSerializer.Serialize(Database.FetchOne(arguments[1]));
-      if (entry == "null") Error.EntryNotFound();
-      Console.WriteLine(entry);
+      var entry = Database.FetchOne(arguments[1]);
+      if (entry == null) Error.EntryNotFound();
+      entry.TotalAccesses++;
+      Database.Update(entry.Id, entry);
+      Console.WriteLine(JsonSerializer.Serialize(entry));
     }
 
     /// <summary>

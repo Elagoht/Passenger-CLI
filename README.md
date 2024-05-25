@@ -1,5 +1,6 @@
 # Passenger CLI
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Elagoht/Passenger-cli/release.yaml)
 ![Codacy Badge](https://app.codacy.com/project/badge/Grade/3ffd2277d4154220bc7477096f390f67)
 ![C# .Net](https://img.shields.io/badge/C%23-.Net_8.0-purple)
 ![GitHub Repo stars](https://img.shields.io/github/stars/Elagoht/Passenger-cli?style=flat)

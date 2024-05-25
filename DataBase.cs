@@ -228,7 +228,7 @@ namespace Passenger
   /// <remarks>
   /// This class provides validation methods for database entries.
   /// </remarks>
-  public class Validate
+  public static class Validate
   {
     /// <summary>
     /// Validate entry

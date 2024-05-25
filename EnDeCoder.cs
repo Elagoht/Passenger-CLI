@@ -3,7 +3,7 @@ namespace Passenger
   public static class EnDeCoder
   {
     // 256-bit, 32-character secret key
-    public const string JSWSecret = "selamiabininselamivarmaalanyokki";
+    public static readonly string JSWSecret = "selamiabininselamivarmaalanyokki";
 
     public static string Encode(string data)
     {

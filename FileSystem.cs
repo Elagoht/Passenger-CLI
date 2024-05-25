@@ -6,7 +6,7 @@ namespace Passenger
   /// <remarks>
   /// This class is responsible for reading and writing data to the file system.
   /// </remarks>
-  public class FileSystem
+  public static class FileSystem
   {
     /// <summary>
     /// Handle exceptions

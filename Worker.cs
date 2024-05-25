@@ -118,7 +118,7 @@ namespace Passenger
       var entry = Database.FetchOne(arguments[1]);
       if (entry == null) Error.EntryNotFound();
       entry.TotalAccesses++;
-      Database.Update(entry.Id, entry);
+      Database.Update(entry.Id, entry, false);
       Console.WriteLine(JsonSerializer.Serialize(entry));
     }
 

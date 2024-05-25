@@ -146,8 +146,11 @@ namespace Passenger
       {
         Id = entry.Id,
         Platform = entry.Platform,
-        Idendity = entry.Identity,
-        Url = entry.Url
+        Identity = entry.Identity,
+        Url = entry.Url,
+        Created = entry.Created,
+        Updated = entry.Updated,
+        TotalAccesses = entry.TotalAccesses
       }
     ).ToList();
 
@@ -178,7 +181,7 @@ namespace Passenger
       {
         Id = entry.Id,
         Platform = entry.Platform,
-        Idendity = entry.Identity,
+        Identity = entry.Identity,
         Url = entry.Url
       }
     ).ToList();
@@ -296,32 +299,6 @@ namespace Passenger
   }
 
   /// <summary>
-  /// Database entry for Passenger
-  /// </summary>
-  /// <remarks>
-  /// This class defines the structure of a database entry.
-  /// </remarks>
-  public class DatabaseEntry
-  {
-    [JsonPropertyName("id"), Required] // Auto-generated
-    public string Id { get; set; }
-    [JsonPropertyName("platform"), Required]
-    public string Platform { get; set; }
-    [JsonPropertyName("url"), Required]
-    public string Url { get; set; }
-    [JsonPropertyName("identity"), Required]
-    public string Identity { get; set; }
-    [JsonPropertyName("passphrase"), Required]
-    public string Passphrase { get; set; }
-    [JsonPropertyName("notes")] // Optional
-    public string Notes { get; set; }
-    [JsonPropertyName("created"), Required] // Auto-generated
-    public string Created { get; set; }
-    [JsonPropertyName("updated"), Required] // Auto-generated
-    public string Updated { get; set; }
-  }
-
-  /// <summary>
   /// Listable database entry for Passenger, does not include passphrase
   /// </summary>
   /// <remarks>
@@ -334,9 +311,29 @@ namespace Passenger
     [JsonPropertyName("platform"), Required]
     public string Platform { get; set; }
     [JsonPropertyName("identity"), Required]
-    public string Idendity { get; set; }
+    public string Identity { get; set; }
     [JsonPropertyName("url"), Required]
     public string Url { get; set; }
+    [JsonPropertyName("created"), Required] // Auto-generated
+    public string Created { get; set; }
+    [JsonPropertyName("updated"), Required] // Auto-generated
+    public string Updated { get; set; }
+    [JsonPropertyName("totalAccesses")] // Auto-generated
+    public int TotalAccesses { get; set; }
+  }
+
+  /// <summary>
+  /// Database entry for Passenger
+  /// </summary>
+  /// <remarks>
+  /// This class defines the structure of a database entry.
+  /// </remarks>
+  public class DatabaseEntry : ListableDatabaseEntry
+  {
+    [JsonPropertyName("passphrase"), Required]
+    public string Passphrase { get; set; }
+    [JsonPropertyName("notes")] // Optional
+    public string Notes { get; set; }
   }
 
   /// <summary>

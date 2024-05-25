@@ -6,7 +6,7 @@
   /// <remarks>
   /// This class is responsible for handling command line arguments and executing the appropriate command.
   /// </remarks>
-  public class Program
+  public static class Program
   {
     /// <summary>
     /// Main entry point

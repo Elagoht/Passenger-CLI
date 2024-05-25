@@ -116,11 +116,9 @@ namespace Passenger
     public void Fetch()
     {
       RoutineAuthControl("fetch", 2);
-      Console.WriteLine(
-        JsonSerializer.Serialize(
-          Database.FetchOne(arguments[1])
-        )
-      );
+      var entry = JsonSerializer.Serialize(Database.FetchOne(arguments[1]));
+      if (entry == "null") Error.EntryNotFound();
+      Console.WriteLine(entry);
     }
 
     /// <summary>

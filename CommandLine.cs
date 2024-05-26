@@ -38,6 +38,7 @@ namespace Passenger
         case "query" or "-q": worker.Query(); break;
         case "update" or "-u": worker.Update(); break;
         case "delete" or "-d": worker.Delete(); break;
+        case "stats" or "-s": worker.Statistics(); break;
         case "version" or "-v" or "--version": Worker.Version(); break;
         case "help" or "--help" or "-h": Worker.Help(); break;
         case "man" or "-m": Worker.Manual(); break;

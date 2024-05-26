@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Passenger
 {
   public class Statistics(DatabaseEntry[] entries)
@@ -72,5 +74,37 @@ namespace Passenger
     public ListableDatabaseEntry[] StrongPassphrases => [..entries.Where(entry =>
       Strengths[entry.Id] > 5
     ).Select(Database.ConvertEntryToListable)];
+  }
+
+  public class DashboardData
+  {
+    [JsonPropertyName("totalCount")]
+    public int TotalCount { get; set; }
+    [JsonPropertyName("averageLength")]
+    public double AverageLength { get; set; }
+    [JsonPropertyName("uniquePlatforms")]
+    public string[] UniquePlatforms { get; set; }
+    [JsonPropertyName("uniquePlatformsCount")]
+    public int UniquePlatformsCount { get; set; }
+    [JsonPropertyName("uniquePassphrases")]
+    public int UniquePassphrases { get; set; }
+    [JsonPropertyName("mostAccessed")]
+    public ListableDatabaseEntry[] MostAccessed { get; set; }
+    [JsonPropertyName("commonByPlatform")]
+    public ListableDatabaseEntry[][] CommonByPlatform { get; set; }
+    [JsonPropertyName("percentageOfCommon")]
+    public double PercentageOfCommon { get; set; }
+    [JsonPropertyName("mostCommon")]
+    public string MostCommon { get; set; }
+    [JsonPropertyName("strengths")]
+    public Dictionary<string, int> Strengths { get; set; }
+    [JsonPropertyName("averageStrength")]
+    public double AverageStrength { get; set; }
+    [JsonPropertyName("weakPassphrases")]
+    public ListableDatabaseEntry[] WeakPassphrases { get; set; }
+    [JsonPropertyName("mediumPassphrases")]
+    public ListableDatabaseEntry[] MediumPassphrases { get; set; }
+    [JsonPropertyName("strongPassphrases")]
+    public ListableDatabaseEntry[] StrongPassphrases { get; set; }
   }
 }

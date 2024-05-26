@@ -141,17 +141,8 @@ namespace Passenger
     /// <remarks>
     /// This method fetches all entries from the database.
     /// </remarks>
-    public static List<ListableDatabaseEntry> FetchAll() => database.Entries.Select(entry =>
-      new ListableDatabaseEntry
-      {
-        Id = entry.Id,
-        Platform = entry.Platform,
-        Identity = entry.Identity,
-        Url = entry.Url,
-        Created = entry.Created,
-        Updated = entry.Updated,
-        TotalAccesses = entry.TotalAccesses
-      }
+    public static List<ListableDatabaseEntry> FetchAll() => database.Entries.Select(
+      ConvertEntryToListable
     ).ToList();
 
     /// <summary>
@@ -222,6 +213,25 @@ namespace Passenger
       database.Entries.RemoveAll(entry => entry.Id == id);
       SaveToFile();
     }
+
+    /// <summary>
+    /// Convert entry to listable format
+    /// </summary>
+    /// <param name="entry">Database entry</param>
+    /// <returns>Listable database entry</returns>
+    /// <remarks>
+    /// This method converts a database entry to a listable database entry.
+    /// </remarks>
+    public static ListableDatabaseEntry ConvertEntryToListable(DatabaseEntry entry) => new()
+    {
+      Id = entry.Id,
+      Platform = entry.Platform,
+      Identity = entry.Identity,
+      Url = entry.Url,
+      Created = entry.Created,
+      Updated = entry.Updated,
+      TotalAccesses = entry.TotalAccesses
+    };
   }
 
   /// <summary>

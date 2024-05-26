@@ -215,6 +215,15 @@ namespace Passenger
     }
 
     /// <summary>
+    /// Get All Entries
+    /// </summary>
+    /// <returns>List of all entries</returns>
+    /// <remarks>
+    /// This method fetches all entries from the database. Only for statistics purposes.
+    /// </remarks>
+    public static DatabaseEntry[] AllEntries => [.. database.Entries];
+
+    /// <summary>
     /// Convert entry to listable format
     /// </summary>
     /// <param name="entry">Database entry</param>

@@ -32,8 +32,8 @@ namespace Passenger
 
       foreach (DatabaseEntry entry in entries)
       {
-        ListableDatabaseEntry[] commonPassword = entries.Where(entry =>
-          entry.Passphrase == entry.Passphrase
+        ListableDatabaseEntry[] commonPassword = entries.Where(current =>
+          current.Passphrase == entry.Passphrase
         ).OrderBy(entry => entry.Platform
         ).Select(Database.ConvertEntryToListable
         ).ToArray();

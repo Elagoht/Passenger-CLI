@@ -14,36 +14,45 @@ namespace Passenger
       entry.Platform
     ).Distinct().ToArray();
 
-    public int UniqueCount => entries.Select(entry =>
+    public int UniquePlatformsCount => UniquePlatforms.Length;
+
+    public int UniquePassphrases => entries.Select(entry =>
       entry.Passphrase
     ).Distinct().Count();
 
-    public DatabaseEntry[] MostAccessed(int limit) => entries.OrderByDescending(entry =>
+    public ListableDatabaseEntry[] MostAccessed(int limit) => entries.OrderByDescending(entry =>
       entry.TotalAccesses
     ).Take(limit).ToArray();
 
-    public DatabaseEntry[][] CommonByPlatform()
+    public ListableDatabaseEntry[][] CommonByPlatform()
     {
-      List<DatabaseEntry[]> commonPasswords = [];
+      List<ListableDatabaseEntry[]> commonPasswords = [];
 
       foreach (DatabaseEntry entry in entries)
       {
-        DatabaseEntry[] commonPassword = entries.Where(e =>
-          e.Passphrase == entry.Passphrase
+        ListableDatabaseEntry[] commonPassword = entries.Where(entry =>
+          entry.Passphrase == entry.Passphrase
+        ).OrderBy(entry => entry.Platform
+        ).Select(Database.ConvertEntryToListable
         ).ToArray();
 
-        if (commonPassword.Length > 1)
-          commonPasswords.Add(commonPassword);
+        if (commonPassword.Length > 1) commonPasswords.Add(commonPassword);
       }
 
       return [.. commonPasswords];
     }
 
-    public double PercentageOfCommon => CommonByPlatform().Length / TotalCount * 100;
+    public double PercentageOfCommon => entries.GroupBy(entry =>
+      entry.Passphrase
+    ).Count(group =>
+      group.Count() > 1
+    ) / TotalCount;
 
-    public string MostCommon => CommonByPlatform().OrderByDescending(commonPasswords =>
-      commonPasswords.Length
-    ).First()[0].Passphrase;
+    public string MostCommon => entries.GroupBy(entry =>
+      entry.Passphrase
+    ).OrderByDescending(group =>
+      group.Count()
+    ).First().Key;
 
     public Dictionary<string, int> Strengths => entries.ToDictionary(entry =>
       entry.Id,
@@ -52,16 +61,16 @@ namespace Passenger
 
     public double AverageStrength => Strengths.Values.Average();
 
-    public DatabaseEntry[] WeakPassphrases => entries.Where(entry =>
+    public ListableDatabaseEntry[] WeakPassphrases => [..entries.Where(entry =>
       Strengths[entry.Id] < 4
-    ).ToArray();
+    ).Select(Database.ConvertEntryToListable)];
 
-    public DatabaseEntry[] MediumPassphrases => entries.Where(entry =>
+    public ListableDatabaseEntry[] MediumPassphrases => [..entries.Where(entry =>
       Strengths[entry.Id] >= 4 && Strengths[entry.Id] <= 5
-    ).ToArray();
+    ).Select(Database.ConvertEntryToListable)];
 
-    public DatabaseEntry[] StrongPassphrases => entries.Where(entry =>
+    public ListableDatabaseEntry[] StrongPassphrases => [..entries.Where(entry =>
       Strengths[entry.Id] > 5
-    ).ToArray();
+    ).Select(Database.ConvertEntryToListable)];
   }
 }

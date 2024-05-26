@@ -166,6 +166,38 @@ namespace Passenger
     }
 
     /*
+     * Statistics
+     */
+
+    /// <summary>
+    /// Show statistics
+    /// </summary>
+    /// <remarks>
+    /// Show statistics of the database.
+    /// </remarks>
+    public void Statistics()
+    {
+      RoutineAuthControl("statistics", 1);
+      Statistics statistics = new(Database.AllEntries);
+      DashboardData dashboardData = new()
+      {
+        TotalCount = statistics.TotalCount,
+        UniquePlatforms = statistics.UniquePlatforms,
+        UniquePlatformsCount = statistics.UniquePlatformsCount,
+        UniquePassphrases = statistics.UniquePassphrases,
+        MostAccessed = statistics.MostAccessed(5),
+        PercentageOfCommon = statistics.PercentageOfCommon,
+        MostCommon = statistics.MostCommon,
+        Strengths = statistics.Strengths,
+        AverageStrength = statistics.AverageStrength,
+        WeakPassphrases = statistics.WeakPassphrases,
+        MediumPassphrases = statistics.MediumPassphrases,
+        StrongPassphrases = statistics.StrongPassphrases
+      };
+      Console.WriteLine(JsonSerializer.Serialize(dashboardData));
+    }
+
+    /*
      * Help and manual
      */
 

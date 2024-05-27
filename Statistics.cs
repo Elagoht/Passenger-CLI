@@ -22,33 +22,30 @@ namespace Passenger
       entry.Passphrase
     ).Distinct().Count();
 
-    public ListableDatabaseEntry[] MostAccessed(int limit) => entries.OrderByDescending(entry =>
+    public CountableDatabaseEntry[] MostAccessed => entries.OrderByDescending(entry =>
       entry.TotalAccesses
-    ).Take(limit).ToArray();
+    ).Take(5
+    ).Select(Database.ConvertEntryToCountable
+    ).ToArray();
 
-    public ListableDatabaseEntry[][] CommonByPlatform()
+    public MicroDatabaseEntry[][] CommonByPlatform => entries.Select(entry =>
     {
-      List<ListableDatabaseEntry[]> commonPasswords = [];
+      MicroDatabaseEntry[] commonPassword = entries.Where(current =>
+        current.Passphrase == entry.Passphrase
+      ).OrderBy(entry => entry.Platform
+      ).Select(Database.ConvertEntryToMicro
+      ).ToArray();
 
-      foreach (DatabaseEntry entry in entries)
-      {
-        ListableDatabaseEntry[] commonPassword = entries.Where(current =>
-          current.Passphrase == entry.Passphrase
-        ).OrderBy(entry => entry.Platform
-        ).Select(Database.ConvertEntryToListable
-        ).ToArray();
+      if (commonPassword.Length > 1)
+        return commonPassword;
+      return null;
+    }).Where(commonPassword =>
+      commonPassword != null
+    ).ToArray();
 
-        if (commonPassword.Length > 1) commonPasswords.Add(commonPassword);
-      }
-
-      return [.. commonPasswords];
-    }
-
-    public double PercentageOfCommon => entries.GroupBy(entry =>
-      entry.Passphrase
-    ).Count(group =>
-      group.Count() > 1
-    ) / TotalCount;
+    public double PercentageOfCommon => CommonByPlatform.SelectMany(commonPassword =>
+      commonPassword
+    ).Distinct().Count() / TotalCount;
 
     public string MostCommon => entries.GroupBy(entry =>
       entry.Passphrase
@@ -63,17 +60,17 @@ namespace Passenger
 
     public double AverageStrength => Strengths.Values.Average();
 
-    public ListableDatabaseEntry[] WeakPassphrases => [..entries.Where(entry =>
+    public MicroDatabaseEntry[] WeakPassphrases => [..entries.Where(entry =>
       Strengths[entry.Id] < 4
-    ).Select(Database.ConvertEntryToListable)];
+    ).Select(Database.ConvertEntryToMicro)];
 
-    public ListableDatabaseEntry[] MediumPassphrases => [..entries.Where(entry =>
+    public MicroDatabaseEntry[] MediumPassphrases => [..entries.Where(entry =>
       Strengths[entry.Id] >= 4 && Strengths[entry.Id] <= 5
-    ).Select(Database.ConvertEntryToListable)];
+    ).Select(Database.ConvertEntryToMicro)];
 
-    public ListableDatabaseEntry[] StrongPassphrases => [..entries.Where(entry =>
+    public MicroDatabaseEntry[] StrongPassphrases => [..entries.Where(entry =>
       Strengths[entry.Id] > 5
-    ).Select(Database.ConvertEntryToListable)];
+    ).Select(Database.ConvertEntryToMicro)];
   }
 
   public class DashboardData
@@ -89,9 +86,9 @@ namespace Passenger
     [JsonPropertyName("uniquePassphrases")]
     public int UniquePassphrases { get; set; }
     [JsonPropertyName("mostAccessed")]
-    public ListableDatabaseEntry[] MostAccessed { get; set; }
+    public CountableDatabaseEntry[] MostAccessed { get; set; }
     [JsonPropertyName("commonByPlatform")]
-    public ListableDatabaseEntry[][] CommonByPlatform { get; set; }
+    public MicroDatabaseEntry[][] CommonByPlatform { get; set; }
     [JsonPropertyName("percentageOfCommon")]
     public double PercentageOfCommon { get; set; }
     [JsonPropertyName("mostCommon")]
@@ -101,10 +98,10 @@ namespace Passenger
     [JsonPropertyName("averageStrength")]
     public double AverageStrength { get; set; }
     [JsonPropertyName("weakPassphrases")]
-    public ListableDatabaseEntry[] WeakPassphrases { get; set; }
+    public MicroDatabaseEntry[] WeakPassphrases { get; set; }
     [JsonPropertyName("mediumPassphrases")]
-    public ListableDatabaseEntry[] MediumPassphrases { get; set; }
+    public MicroDatabaseEntry[] MediumPassphrases { get; set; }
     [JsonPropertyName("strongPassphrases")]
-    public ListableDatabaseEntry[] StrongPassphrases { get; set; }
+    public MicroDatabaseEntry[] StrongPassphrases { get; set; }
   }
 }

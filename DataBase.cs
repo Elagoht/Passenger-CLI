@@ -241,6 +241,37 @@ namespace Passenger
       Updated = entry.Updated,
       TotalAccesses = entry.TotalAccesses
     };
+
+    /// <summary>
+    /// Convert entry to countable format
+    /// </summary>
+    /// <param name="entry">Database entry</param>
+    /// <returns>Countable database entry</returns>
+    /// <remarks>
+    /// This method converts a database entry to a countable database entry.
+    /// </remarks>
+    public static CountableDatabaseEntry ConvertEntryToCountable(DatabaseEntry entry) => new()
+    {
+      Platform = entry.Platform,
+      Id = entry.Id,
+      Url = entry.Url,
+      TotalAccesses = entry.TotalAccesses
+    };
+
+    /// <summary> 
+    /// Convert entry to micro format
+    /// </summary>
+    /// <param name="entry">Database entry</param>
+    /// <returns>Micro database entry</returns>
+    /// <remarks>
+    /// This method converts a database entry to a micro database entry.
+    /// </remarks>
+    public static MicroDatabaseEntry ConvertEntryToMicro(DatabaseEntry entry) => new()
+    {
+      Platform = entry.Platform,
+      Id = entry.Id,
+      Url = entry.Url
+    };
   }
 
   /// <summary>
@@ -317,28 +348,36 @@ namespace Passenger
     public List<DatabaseEntry> Entries { get; set; }
   }
 
+  public class MicroDatabaseEntry
+  {
+    [JsonPropertyName("platform"), Required]
+    public string Platform { get; set; }
+    [JsonPropertyName("id"), Required]
+    public string Id { get; set; }
+    [JsonPropertyName("url"), Required]
+    public string Url { get; set; }
+  }
+
+  public class CountableDatabaseEntry : MicroDatabaseEntry
+  {
+    [JsonPropertyName("totalAccesses"), Required]
+    public int TotalAccesses { get; set; }
+  }
+
   /// <summary>
   /// Listable database entry for Passenger, does not include passphrase
   /// </summary>
   /// <remarks>
   /// This class defines the structure of a listable database entry.
   /// </remarks>
-  public class ListableDatabaseEntry
+  public class ListableDatabaseEntry : CountableDatabaseEntry
   {
-    [JsonPropertyName("id"), Required]
-    public string Id { get; set; }
-    [JsonPropertyName("platform"), Required]
-    public string Platform { get; set; }
     [JsonPropertyName("identity"), Required]
     public string Identity { get; set; }
-    [JsonPropertyName("url"), Required]
-    public string Url { get; set; }
     [JsonPropertyName("created"), Required] // Auto-generated
     public string Created { get; set; }
     [JsonPropertyName("updated"), Required] // Auto-generated
     public string Updated { get; set; }
-    [JsonPropertyName("totalAccesses")] // Auto-generated
-    public int TotalAccesses { get; set; }
   }
 
   /// <summary>

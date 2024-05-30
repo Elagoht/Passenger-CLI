@@ -69,12 +69,6 @@ Show statistics of the Passenger client, requires a JWT token.
 .B passenger stats [jwt]
 .RE
 .TP
-.BR version " \-v" " \-\-version"
-Show the version of the Passenger software.
-.RS
-.B passenger version 
-.RE
-.TP
 .BR generate " \-g"
 Generate a passphrase with the given length, requires a JWT token.
 .RS
@@ -85,6 +79,13 @@ Generate a passphrase with the given length, requires a JWT token.
 Manipulate a passphrase by changing characters looking similar to others.
 .RS
 .B passenger manipulate [jwt] [passphrase]
+.RE
+.TP
+.BR version " \-v" " \-\-version"
+Show the version of the Passenger software.
+.RS
+.B passenger version 
+
 .RE
 .TP
 .BR help " \-h" " \-\-help"

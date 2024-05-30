@@ -191,12 +191,14 @@ namespace Passenger
       if (index == -1) Error.EntryNotFound();
       entry = Validate.Entry(entry);
 
-      entry.Id = database.Entries[index].Id; // Protect id being updated
-      entry.Created = database.Entries[index].Created; // Protect created date before updating
-      entry.Updated = !preserveUpdated // Preserve updated date if wanted
-        ? entry.Updated
+      // Protect private fields
+      DatabaseEntry currentEntry = database.Entries[index];
+      entry.Id = currentEntry.Id;
+      entry.Created = currentEntry.Created;
+      entry.Updated = preserveUpdated
+        ? currentEntry.Updated
         : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-      // Update entry in database and save
+      entry.TotalAccesses = currentEntry.TotalAccesses; // Do not increase
       database.Entries[index] = entry;
       SaveToFile();
     }

@@ -2,7 +2,7 @@ using System.Text;
 
 namespace Passenger
 {
-  public class Generate
+  public static class Generator
   {
     private static readonly Dictionary<string, List<string>> manipulate = new()
     {

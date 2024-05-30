@@ -63,9 +63,12 @@ namespace Passenger
       foreach (char character in input)
       {
         string lowerChar = character.ToString().ToLower();
-        passphrase.Append(manipulate.ContainsKey(lowerChar)
-          ? manipulate[lowerChar][random.Next(manipulate[lowerChar].Count)]
-          : lowerChar);
+        passphrase.Append(manipulate.TryGetValue(
+          lowerChar,
+          out List<string> value
+        ) ? value[random.Next(value.Count)]
+          : lowerChar
+        );
       }
 
       return passphrase.ToString();

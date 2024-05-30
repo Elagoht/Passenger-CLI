@@ -1,4 +1,5 @@
 using System.Text;
+using System.Globalization;
 
 namespace Passenger
 {
@@ -55,9 +56,9 @@ namespace Passenger
       {"?", new(){"7"}}
     };
 
-    private static readonly string specials = "@_.";
+    private static readonly string specials = "@_.-€£$~!#%^&*()+=[]{}|;:,<>?/";
     private static readonly string lowers = "abcdefghijklmnopqrstuvyz";
-    private static readonly string letters = lowers + lowers.ToUpper();
+    private static readonly string letters = lowers + lowers.ToUpper(CultureInfo.InvariantCulture);
     private static readonly string numbers = "0123456789";
     /// <summary>
     /// Character sets for password generation.
@@ -76,7 +77,7 @@ namespace Passenger
       StringBuilder passphrase = new();
       foreach (char character in input)
       {
-        string lowerChar = character.ToString().ToLower();
+        string lowerChar = character.ToString().ToLower(CultureInfo.InvariantCulture);
         passphrase.Append(manipulate.TryGetValue(
           lowerChar,
           out List<string> value

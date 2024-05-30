@@ -75,14 +75,26 @@ Show the version of the Passenger software.
 .B passenger version 
 .RE
 .TP
+.BR generate " \-g"
+Generate a passphrase with the given length, requires a JWT token.
+.RS
+.B passenger generate [jwt] [length]
+.RE
+.TP
+.BR manipulate " \-m"
+Manipulate a passphrase by changing characters looking similar to others.
+.RS
+.B passenger manipulate [jwt] [passphrase]
+.RE
+.TP
 .BR help " \-h" " \-\-help"
 Show this help message and exit.
 .RS
 .B passenger help
 .RE
 .TP
-.BR man " \-m"
-Show the manual page, if available.
+.BR man " \-M"
+Show the manual page.
 .RS
 .B passenger man
 .RE

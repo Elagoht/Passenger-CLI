@@ -306,6 +306,10 @@ COMMANDS
             Delete an entry by its UUID, requires a JWT token.
             passenger delete [jwt] [uuid]
 
+      statis -s
+            Show statistics of the database.
+            passenger statis [jwt]
+
       generate -g
             Generate a passphrase with the given length.
             Default length is 32.
@@ -365,6 +369,7 @@ Commands:
   create     -c [jwt] [json]            : store an entry with the given json
   update     -u [jwt] [uuid] [json]     : update an entry by its uuid
   delete     -d [jwt] [uuid]            : delete an entry by its index
+  statis     -s [jwt]                   : show statistics of the database
   generate   -g [length]                : generate a passphrase with the given length
   manipulate -m [passphrase]            : manipulate a passphrase
   version    -v --version               : show the version and exit

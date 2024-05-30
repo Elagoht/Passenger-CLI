@@ -39,9 +39,11 @@ namespace Passenger
         case "update" or "-u": worker.Update(); break;
         case "delete" or "-d": worker.Delete(); break;
         case "stats" or "-s": worker.Statistics(); break;
+        case "generate" or "-g": worker.Generate(); break;
+        case "manipulate" or "-m": worker.Manipulate(); break;
         case "version" or "-v" or "--version": Worker.Version(); break;
         case "help" or "--help" or "-h": Worker.Help(); break;
-        case "man" or "-m": Worker.Manual(); break;
+        case "man" or "-M": Worker.Manual(); break;
         default: Error.UnknownCommand(); break;
       }
     }

@@ -200,6 +200,44 @@ namespace Passenger
     }
 
     /*
+     * Generation
+     */
+
+    /// <summary>
+    /// Generate a passphrase
+    /// </summary>
+    /// <returns>A secure random passphrase</returns>
+    /// <remarks>
+    /// Generate a passphrase with the given length. Default length is 32.
+    /// </remarks>
+    public void Generate()
+    {
+      switch (arguments.Length)
+      {
+        case 0:
+          Console.WriteLine(Generator.New()); break;
+        case 1:
+          Console.WriteLine(Generator.New(int.Parse(arguments[0]))); break;
+        default:
+          Error.ArgumentCount("generate", 0, 1);
+          break;
+      }
+    }
+
+    /// <summary>
+    /// Manipulate a passphrase
+    /// </summary>
+    /// <returns>A manipulated passphrase</returns>
+    /// <remarks>
+    /// Manipulate a passphrase by changing its characters. Still recognizable by humans.
+    /// </remarks>
+    public void Manipulate()
+    {
+      if (arguments.Length != 1) Error.ArgumentCount("manipulate", 1);
+      Console.WriteLine(Generator.Manipulated(arguments[0]));
+    }
+
+    /*
      * Help and manual
      */
 
@@ -268,6 +306,16 @@ COMMANDS
             Delete an entry by its UUID, requires a JWT token.
             passenger delete [jwt] [uuid]
 
+      generate -g
+            Generate a passphrase with the given length.
+            Default length is 32.
+            passenger generate [length]
+
+      manipulate -m
+            Manipulate a passphrase by changing its characters.
+            Still recognizable by humans.
+            passenger manipulate [passphrase]
+
       version -v --version
             Show the version of the Passenger software.
             passenger version
@@ -276,7 +324,8 @@ COMMANDS
             Show this help message and exit.
             passenger help
 
-      man -m Show the manual page, if available.
+      man -M
+            Show the manual page, if available.
             passenger man
 
 AUTHOR
@@ -307,18 +356,20 @@ Usage:
   passenger [command] [*args]
 
 Commands:
-  login     -l [username] [passphrase] : generate a JWT token to use other commands
-  register  -r [username] [passphrase] : register a passphrase to the passenger client
-  reset     -R [jwt] [new]             : reset the passphrase of the passenger client
-  fetchAll  -a [jwt]                   : list all entries without their passphrases
-  query     -q [jwt] [keyword]         : list search results without their passphrases
-  fetch     -f [jwt] [uuid]            : retrieve an entry by its uuid with its passphrase
-  create    -c [jwt] [json]            : store an entry with the given json
-  update    -u [jwt] [uuid] [json]     : update an entry by its uuid
-  delete    -d [jwt] [uuid]            : delete an entry by its index
-  version   -v --version               : show the version and exit
-  help      -h --help                  : show this help message and exit
-  man       -m                         : show the manual page, if available
+  login      -l [username] [passphrase] : generate a JWT token to use other commands
+  register   -r [username] [passphrase] : register a passphrase to the passenger client
+  reset      -R [jwt] [new]             : reset the passphrase of the passenger client
+  fetchAll   -a [jwt]                   : list all entries without their passphrases
+  query      -q [jwt] [keyword]         : list search results without their passphrases
+  fetch      -f [jwt] [uuid]            : retrieve an entry by its uuid with its passphrase
+  create     -c [jwt] [json]            : store an entry with the given json
+  update     -u [jwt] [uuid] [json]     : update an entry by its uuid
+  delete     -d [jwt] [uuid]            : delete an entry by its index
+  generate   -g [length]                : generate a passphrase with the given length
+  manipulate -m [passphrase]            : manipulate a passphrase
+  version    -v --version               : show the version and exit
+  help       -h --help                  : show this help message and exit
+  man        -M                         : show the manual page, if available
 ");
       Environment.Exit(0);
     }

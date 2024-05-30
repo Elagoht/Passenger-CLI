@@ -49,6 +49,12 @@ namespace Passenger
       {"?", new(){"7"}}
     };
 
+    private static readonly string specials = "@_.";
+    private static readonly string lowers = "abcdefghijklmnopqrstuvyz";
+    private static readonly string letters = lowers + lowers.ToUpper();
+    private static readonly string numbers = "0123456789";
+    private static readonly string chars = letters + numbers + specials;
+
     private static readonly Random random = new();
 
     public static string Manipulated(string input)
@@ -61,6 +67,23 @@ namespace Passenger
           ? manipulate[lowerChar][random.Next(manipulate[lowerChar].Count)]
           : lowerChar);
       }
+
+      return passphrase.ToString();
+    }
+
+    public static string New(int length = 32)
+    {
+      StringBuilder passphrase = new();
+      for (int i = 0; i < length; i++)
+        passphrase.Append(chars[random.Next(chars.Length)]);
+
+      foreach (char special in specials)
+        while (!passphrase.ToString().Contains(special))
+        {
+          int randomIndex = random.Next(passphrase.Length);
+          if (!specials.Contains(passphrase[randomIndex]))
+            passphrase[randomIndex] = special;
+        }
 
       return passphrase.ToString();
     }

@@ -25,7 +25,6 @@ namespace Passenger
     /// </remarks>
     public void Parse()
     {
-      if (string.IsNullOrEmpty(command)) Error.MissingCommand();
       Worker worker = new(args);
       switch (command)
       {

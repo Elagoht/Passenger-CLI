@@ -348,7 +348,24 @@ namespace Passenger
     /// </summary>
     [JsonPropertyName("entries")]
     public List<DatabaseEntry> Entries { get; set; }
+    /// <summary>
+    /// A list of constants in the database
+    /// </summary>
+    [JsonPropertyName("constants")]
+    public List<ConstantPair> Constants { get; set; }
   }
+
+  /// <summary>
+  /// Key-value pair for constants to use short names on the database
+  /// </summary>
+  public class ConstantPair
+  {
+    [JsonPropertyName("constant"), Required]
+    public string Constant { get; set; }
+    [JsonPropertyName("value"), Required]
+    public string Value { get; set; }
+  }
+
 
   public class MicroDatabaseEntry
   {

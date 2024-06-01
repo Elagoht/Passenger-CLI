@@ -44,7 +44,7 @@ namespace Passenger
       {"2", new(){"Z","z","2"}},
       {"3", new(){"B","3"}},
       {"4", new(){"A","4"}},
-      {"5", new(){"S","s","5"}},
+      {"5", new(){"S","s","$"}},
       {"6", new(){"G","6"}},
       {"7", new(){"7","?","T"}},
       {"8", new(){"B","8"}},
@@ -58,12 +58,12 @@ namespace Passenger
 
     private static readonly string specials = "@_.-€£$~!#%^&*()+=[]{}|;:,<>?/";
     private static readonly string lowers = "abcdefghijklmnopqrstuvyz";
-    private static readonly string letters = lowers + lowers.ToUpper(CultureInfo.InvariantCulture);
+    private static readonly string uppers = lowers.ToUpper(CultureInfo.InvariantCulture);
     private static readonly string numbers = "0123456789";
     /// <summary>
     /// Character sets for password generation.
     /// </summary>
-    private static readonly string chars = letters + numbers + specials;
+    private static readonly string chars = lowers + uppers + numbers + specials;
 
     private static readonly Random random = new();
 
@@ -89,22 +89,44 @@ namespace Passenger
       return passphrase.ToString();
     }
 
-    /// <summary>Generate a new passphrase.</summary>
-    /// <param name="length">length of the passphrase</param>
-    /// <returns>new passphrase</returns>
-    public static string New(int length = 32)
+    public static string New(int wantedLength = 32)
     {
+      int length = wantedLength < 8
+        ? 8
+        : wantedLength;
+
       StringBuilder passphrase = new();
-      for (int i = 0; i < length; i++)
+
+      // Generate a passphrase with the specified length
+      for (int i = passphrase.Length; i < length; i++)
         passphrase.Append(chars[random.Next(chars.Length)]);
 
-      foreach (char special in specials)
-        while (!passphrase.ToString().Contains(special))
+      /**
+       * ! We do not use a while loop to ensure that
+       * the passphrase contains at least two characters 
+       * from each set. Using a while loop, can result
+       * in an infinite loop if the random number 
+       * generator keeps generating the same index.
+       */
+
+      // Generate 8 different index
+      List<int> positions = Enumerable.Range(0, length
+      ).OrderBy(x => random.Next()
+      ).Take(8
+      ).ToList();
+
+      // Ensure that the passphrase contains at least two characters from each set
+      for (int position = 0; position < 8; ++position)
+      {
+        string set = (position % 4) switch
         {
-          int randomIndex = random.Next(passphrase.Length);
-          if (!specials.Contains(passphrase[randomIndex]))
-            passphrase[randomIndex] = special;
-        }
+          0 => lowers,
+          1 => uppers,
+          2 => numbers,
+          _ => specials,
+        };
+        passphrase[positions[position]] = set[random.Next(set.Length)];
+      }
 
       return passphrase.ToString();
     }

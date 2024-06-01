@@ -306,9 +306,19 @@ COMMANDS
             Delete an entry by its UUID, requires a JWT token.
             passenger delete [jwt] [uuid]
 
-      statis -s
+      stats -s
             Show statistics of the database.
             passenger statis [jwt]
+
+      declare -D
+            Declare a new key-value pair, requires a JWT token.
+            Theses pairs are constant values that can be replaced
+            on response.
+            passenger declare [jwt] [key] [value]
+
+      forget -F
+            Forget a key-value pair, requires a JWT token.
+            passenger forget [jwt] [key]
 
       generate -g
             Generate a passphrase with the given length.
@@ -370,6 +380,8 @@ Commands:
   update     -u [jwt] [uuid] [json]     : update an entry by its uuid
   delete     -d [jwt] [uuid]            : delete an entry by its index
   statis     -s [jwt]                   : show statistics of the database
+  declare    -D [jwt] [key] [value]     : declare a new key-value pair
+  forget     -F [jwt] [key]             : forget a key-value pair
   generate   -g [length]                : generate a passphrase with the given length
   manipulate -m [passphrase]            : manipulate a passphrase
   version    -v --version               : show the version and exit

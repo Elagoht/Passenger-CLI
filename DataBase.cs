@@ -93,6 +93,7 @@ namespace Passenger
       database.Passphrase = passphrase;
       database.Username = username;
       database.Entries = [];
+      database.Constants = [];
       SaveToFile();
     }
 
@@ -129,6 +130,7 @@ namespace Passenger
       entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
       entry.Updated = entry.Created;
       // Append entry to database and save
+      database.Entries ??= [];
       database.Entries.Add(entry);
       SaveToFile();
       return JsonSerializer.Serialize(entry);
@@ -216,6 +218,49 @@ namespace Passenger
       SaveToFile();
     }
 
+    /*
+     * Constants pair methods
+     */
+
+    /// <summary>
+    /// Declare constant pair
+    /// </summary>
+    /// <param name="entry">Constant pair entry</param>
+    public static void DeclareConstant(ConstantPair entry)
+    {
+      Validate.ConstantPair(entry);
+      database.Constants ??= [];
+      database.Constants.Add(entry);
+      SaveToFile();
+    }
+
+    /// <summary>
+    /// Fetch constant pair
+    /// </summary>
+    /// <param name="constant">Constant key</param>
+    /// <returns>Constant pair</returns>
+    public static ConstantPair FetchConstant(string constant) =>
+      (database.Constants ?? []).Find(pair =>
+        pair.Key == constant
+      );
+
+    /// <summary>
+    /// Forget constant pair
+    /// </summary>
+    /// <param name="constant">Constant key</param>
+    public static void ForgetConstant(string constant)
+    {
+      if (FetchConstant(constant) == null) Error.EntryNotFound();
+      database.Constants.RemoveAll((pair) =>
+        pair.Key == constant
+      );
+      SaveToFile();
+    }
+
+    /*
+     * Conversion methods
+     */
+
     /// <summary>
     /// Get All Entries
     /// </summary>
@@ -277,46 +322,6 @@ namespace Passenger
   }
 
   /// <summary>
-  /// Validation methods for Passenger
-  /// </summary>
-  /// <remarks>
-  /// This class provides validation methods for database entries.
-  /// </remarks>
-  public static class Validate
-  {
-    /// <summary>
-    /// Validate entry
-    /// </summary>
-    /// <param name="entry">Database entry</param>
-    /// <returns>Validated database entry</returns>
-    /// <remarks>
-    /// This method validates a database entry and auto-generates created and updated fields.
-    /// </remarks>
-    public static DatabaseEntry Entry(DatabaseEntry entry)
-    {
-      // Check if required fields are provided
-      if (string.IsNullOrEmpty(entry.Platform)) Error.MissingField("platform");
-      if (string.IsNullOrEmpty(entry.Passphrase)) Error.MissingField("passphrase");
-      if (string.IsNullOrEmpty(entry.Url)) Error.MissingField("url");
-      if (string.IsNullOrEmpty(entry.Identity)) Error.MissingField("identity");
-      return entry;
-    }
-
-    /// <summary>
-    /// Validate JSON as database entry
-    /// </summary>
-    /// <param name="json">JSON string</param>
-    /// <remarks>
-    /// Validates and parses a JSON string as a database entry else exits the program with an error.
-    /// </remarks>
-    public static DatabaseEntry JsonAsDatabaseEntry(string json)
-    {
-      try { return JsonSerializer.Deserialize<DatabaseEntry>(json); }
-      catch { Error.JsonParseError(); return null; }
-    }
-  }
-
-  /// <summary>
   /// Database model for Passenger
   /// </summary>
   /// <remarks>
@@ -360,8 +365,8 @@ namespace Passenger
   /// </summary>
   public class ConstantPair
   {
-    [JsonPropertyName("constant"), Required]
-    public string Constant { get; set; }
+    [JsonPropertyName("key"), Required]
+    public string Key { get; set; }
     [JsonPropertyName("value"), Required]
     public string Value { get; set; }
   }

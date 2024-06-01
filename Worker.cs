@@ -200,6 +200,34 @@ namespace Passenger
     }
 
     /*
+     * Constant pairs
+     */
+
+    /// <summary> 
+    /// Declare a new key-value pair constant
+    /// </summary>
+    public void Declare()
+    {
+      RoutineAuthControl("declare", 3);
+      ConstantPair constantPair = new()
+      {
+        Key = arguments[1],
+        Value = arguments[2]
+      };
+      Validate.ConstantPair(constantPair);
+      Database.DeclareConstant(constantPair);
+    }
+
+    /// <summary>
+    /// Forget a key-value pair constant
+    /// </summary>
+    public void Forget()
+    {
+      RoutineAuthControl("forget", 2);
+      Database.ForgetConstant(arguments[1]);
+    }
+
+    /*
      * Generation
      */
 

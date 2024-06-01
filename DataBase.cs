@@ -257,6 +257,12 @@ namespace Passenger
       SaveToFile();
     }
 
+    /// <summary>
+    /// Get all constants
+    /// </summary>
+    /// <returns>List of constant pairs</returns>
+    public static List<ConstantPair> AllConstants => database.Constants;
+
     /*
      * Conversion methods
      */

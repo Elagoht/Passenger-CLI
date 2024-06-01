@@ -227,6 +227,17 @@ namespace Passenger
       Database.ForgetConstant(arguments[1]);
     }
 
+    /// <summary>
+    /// List all declared constants
+    /// </summary>
+    public void Constants()
+    {
+      RoutineAuthControl("constants", 1);
+      Console.WriteLine(
+        JsonSerializer.Serialize(Database.AllConstants)
+      );
+    }
+
     /*
      * Generation
      */
@@ -348,6 +359,10 @@ COMMANDS
             Forget a key-value pair, requires a JWT token.
             passenger forget [jwt] [key]
 
+      constants -C
+            List all declared constants, requires a JWT token.
+            passenger constants [jwt]
+
       generate -g
             Generate a passphrase with the given length.
             Default length is 32.
@@ -410,6 +425,7 @@ Commands:
   statis     -s [jwt]                   : show statistics of the database
   declare    -D [jwt] [key] [value]     : declare a new key-value pair
   forget     -F [jwt] [key]             : forget a key-value pair
+  constants  -C [jwt]                   : list all declared constants
   generate   -g [length]                : generate a passphrase with the given length
   manipulate -m [passphrase]            : manipulate a passphrase
   version    -v --version               : show the version and exit

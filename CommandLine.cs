@@ -40,6 +40,7 @@ namespace Passenger
         case "stats" or "-s": worker.Statistics(); break;
         case "declare" or "-D": worker.Declare(); break;
         case "forget" or "-F": worker.Forget(); break;
+        case "constants" or "-C": worker.Constants(); break;
         case "generate" or "-g": worker.Generate(); break;
         case "manipulate" or "-m": worker.Manipulate(); break;
         case "version" or "-v" or "--version": Worker.Version(); break;

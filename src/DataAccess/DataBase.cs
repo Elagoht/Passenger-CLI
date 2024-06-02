@@ -155,8 +155,12 @@ namespace Passenger
     /// <remarks>
     /// This method fetches one entry from the database.
     /// </remarks>
-    public static DatabaseEntry FetchOne(string id) => database.Entries
-      .Find(entry => entry.Id == id);
+    public static DatabaseEntry FetchOne(string id)
+    {
+      DatabaseEntry entry = database.Entries.Find(entry => entry.Id == id);
+      entry.Identity = ResolveConstant(entry.Identity);
+      return entry;
+    }
 
     /// <summary>
     /// Query entries
@@ -170,14 +174,8 @@ namespace Passenger
         (entry.Platform != null && entry.Platform.Contains(keyword)) ||
         (entry.Identity != null && entry.Identity.Contains(keyword)) ||
         (entry.Url != null && entry.Url.Contains(keyword))
-      ).Select(entry => new ListableDatabaseEntry
-      {
-        Id = entry.Id,
-        Platform = entry.Platform,
-        Identity = entry.Identity,
-        Url = entry.Url
-      }
-    ).ToList();
+      ).Select(ConvertEntryToListable
+      ).ToList();
 
     /// <summary>
     /// Update entry
@@ -189,7 +187,7 @@ namespace Passenger
     /// </remarks>
     public static void Update(string id, DatabaseEntry entry, bool preserveUpdated = true)
     {
-      var index = database.Entries.FindIndex(entry => entry.Id == id);
+      int index = database.Entries.FindIndex(entry => entry.Id == id);
       if (index == -1) Error.EntryNotFound();
       entry = Validate.Entry(entry);
 
@@ -261,7 +259,17 @@ namespace Passenger
     /// Get all constants
     /// </summary>
     /// <returns>List of constant pairs</returns>
-    public static List<ConstantPair> AllConstants => database.Constants;
+    public static List<ConstantPair> AllConstants => database.Constants ?? [];
+
+    /// <summary>
+    /// Resolve constant
+    /// </summary>
+    /// <param name="constant">Constant key</param>
+    /// <returns>Constant value</returns>
+    public static string ResolveConstant(string key) =>
+      AllConstants.Find((pair) =>
+        $"_${pair.Key}" == key
+      )?.Value ?? key;
 
     /*
      * Conversion methods
@@ -288,7 +296,7 @@ namespace Passenger
     {
       Id = entry.Id,
       Platform = entry.Platform,
-      Identity = entry.Identity,
+      Identity = ResolveConstant(entry.Identity),
       Url = entry.Url,
       Created = entry.Created,
       Updated = entry.Updated,
@@ -376,7 +384,6 @@ namespace Passenger
     [JsonPropertyName("value"), Required]
     public string Value { get; set; }
   }
-
 
   public class MicroDatabaseEntry
   {

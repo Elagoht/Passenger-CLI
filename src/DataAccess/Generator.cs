@@ -3,14 +3,8 @@ using System.Globalization;
 
 namespace Passenger
 {
-  /// <summary>
-  /// Generate random passwords and manipulate existing ones.
-  /// </summary>
   public static class Generator
   {
-    /// <summary>
-    /// Match characters to another set of characters that look similar.
-    /// </summary>
     private static readonly Dictionary<string, List<string>> manipulate = new()
     {
       {"q", new(){"Q","q"}},
@@ -60,18 +54,10 @@ namespace Passenger
     private static readonly string lowers = "abcdefghijklmnopqrstuvyz";
     private static readonly string uppers = lowers.ToUpper(CultureInfo.InvariantCulture);
     private static readonly string numbers = "0123456789";
-    /// <summary>
-    /// Character sets for password generation.
-    /// </summary>
     private static readonly string chars = lowers + uppers + numbers + specials;
 
     private static readonly Random random = new();
 
-    /// <summary>
-    /// Manipulate a passphrase by replacing characters with similar looking ones.
-    /// </summary>
-    /// <param name="input">original passphrase</param>
-    /// <returns>manipulated passphrase</returns>
     public static string Manipulated(string input)
     {
       StringBuilder passphrase = new();
@@ -123,7 +109,7 @@ namespace Passenger
           0 => lowers,
           1 => uppers,
           2 => numbers,
-          _ => specials,
+          _ => specials
         };
         passphrase[positions[position]] = set[random.Next(set.Length)];
       }

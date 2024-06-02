@@ -2,23 +2,8 @@ using System.Text.Json;
 
 namespace Passenger
 {
-
-  /// <summary>
-  /// Validation methods for Passenger
-  /// </summary>
-  /// <remarks>
-  /// This class provides validation methods for database entries.
-  /// </remarks>
   public static class Validate
   {
-    /// <summary>
-    /// Validate entry
-    /// </summary>
-    /// <param name="entry">Database entry</param>
-    /// <returns>Validated database entry</returns>
-    /// <remarks>
-    /// This method validates a database entry and auto-generates created and updated fields.
-    /// </remarks>
     public static DatabaseEntry Entry(DatabaseEntry entry)
     {
       // Check if required fields are provided
@@ -29,11 +14,6 @@ namespace Passenger
       return entry;
     }
 
-    /// <summary>
-    /// Validate Constant entry
-    /// </summary>
-    /// <param name="entry">Constant pair entry</param>
-    /// <returns>Validated constant pair entry</returns>
     public static ConstantPair ConstantPair(ConstantPair entry)
     {
       // Check if required fields are provided
@@ -43,13 +23,6 @@ namespace Passenger
       return entry;
     }
 
-    /// <summary>
-    /// Validate JSON as database entry
-    /// </summary>
-    /// <param name="json">JSON string</param>
-    /// <remarks>
-    /// Validates and parses a JSON string as a database entry else exits the program with an error.
-    /// </remarks>
     public static DatabaseEntry JsonAsDatabaseEntry(string json)
     {
       try { return JsonSerializer.Deserialize<DatabaseEntry>(json); }

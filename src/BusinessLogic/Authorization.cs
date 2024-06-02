@@ -3,30 +3,13 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 namespace Passenger
 {
-  /// <summary>
-  /// Authorization methods
-  /// </summary>
-  /// <param name="secretKey"></param>
-  /// <remarks>
-  /// This class provides methods for generating and validating JWT tokens.
-  /// </remarks>
   class Authorization(string secretKey)
   {
-    private readonly string _secretKey = secretKey;
-
-    /// <summary>
-    /// Generate JWT token
-    /// </summary>
-    /// <param name="passphrase"></param>
-    /// <returns>JWT token</returns>
-    /// <remarks>
-    /// This method generates a JWT token with the provided passphrase. This token is required to use other commands via command line.
-    /// </remarks>
     public string GenerateToken(string username, string passphrase)
     {
       ValidatePassphrase(username, passphrase);
 
-      SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(_secretKey));
+      SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(secretKey));
       SecurityTokenDescriptor tokenDescriptor = new()
       {
         IssuedAt = DateTime.UtcNow,
@@ -42,14 +25,6 @@ namespace Passenger
       return tokenHandler.WriteToken(token);
     }
 
-    /// <summary>
-    /// Validate JWT token
-    /// </summary>
-    /// <param name="token"></param>
-    /// <returns>True if token is valid, false otherwise</returns>
-    /// <remarks>
-    /// This method validates a JWT token.
-    /// </remarks>
     public bool ValidateToken(string token)
     {
       TokenValidationParameters validationParameters = new()
@@ -58,7 +33,7 @@ namespace Passenger
         ValidIssuer = "passenger-cli",
         ValidateAudience = false,
         ValidateLifetime = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
       };
 
       JwtSecurityTokenHandler tokenHandler = new();
@@ -69,17 +44,9 @@ namespace Passenger
       catch { return false; }
     }
 
-    /// <summary>
-    /// Validate passphrase
-    /// </summary>
-    /// <param name="passphrase"></param>
-    /// <returns>True if passphrase is valid, false otherwise</returns>
-    /// <remarks>
-    /// This method validates a passphrase.
-    /// </remarks>
     public static bool ValidatePassphrase(string username, string passphrase)
     {
-      // This is a placeholder for a more complex validation algorithm
+      // TODO: This is a placeholder for a more complex validation algorithm
       if (!Database.IsRegistered())
       {
         Console.WriteLine("passenger: not registered yet");

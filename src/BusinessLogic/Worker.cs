@@ -115,7 +115,7 @@ namespace Passenger
     public void Fetch()
     {
       RoutineAuthControl("fetch", 2);
-      var entry = Database.FetchOne(arguments[1]);
+      DatabaseEntry entry = Database.FetchOne(arguments[1]);
       if (entry == null) Error.EntryNotFound();
       entry.TotalAccesses++;
       Database.Update(entry.Id, entry, false);

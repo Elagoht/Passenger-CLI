@@ -12,13 +12,14 @@ Passenger is a sophisticated passphrase manager designed to securely store your 
 
 ## Features
 
-- **Database Operations**: The [`Database`](DataBase.cs) class facilitates CRUD operations for the database.
-- **File System Interactions**: The [`FileSystem`](FileSystem.cs) class handles reading and writing data to the file system.
-- **Authorization**: Managed in [`Authorization.cs`](Authorization.cs).
-- **Command Line Interactions**: Implemented in [`CommandLine.cs`](CommandLine.cs).
-- **Encoding and Decoding**: Provided by [`EnDeCoder.cs`](EnDeCoder.cs).
-- **Global Variables and Constants**: Defined in [`Globals.cs`](Globals.cs).
-- **Worker Operations**: Executed in [`Worker.cs`](Worker.cs).
+Passenger-cli offers the following features:
+
+* Passenger Management: Add, update, and remove passengers from the system.
+* Authorization: Secure access to different operations based on user roles.
+* Database Integration: Store and retrieve passenger data using a built-in database system.
+* Data Encoding/Decoding: Allows users to create their own algorithms for encoding/decoding.
+* Command-Line Interface: User-friendly CLI for interacting with the system.
+* Security: Passenger will use AES-GSM to protect your database.
 
 ## Building the Project
 

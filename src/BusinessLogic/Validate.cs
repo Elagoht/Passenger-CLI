@@ -4,14 +4,14 @@ namespace Passenger
 {
   public static class Validate
   {
-    public static DatabaseEntry Entry(DatabaseEntry entry)
+    public static DatabaseEntry Entry(DatabaseEntry databaseEntry)
     {
       // Check if required fields are provided
-      if (string.IsNullOrEmpty(entry.Platform)) Error.MissingField("platform");
-      if (string.IsNullOrEmpty(entry.Passphrase)) Error.MissingField("passphrase");
-      if (string.IsNullOrEmpty(entry.Url)) Error.MissingField("url");
-      if (string.IsNullOrEmpty(entry.Identity)) Error.MissingField("identity");
-      return entry;
+      if (string.IsNullOrEmpty(databaseEntry.Platform)) Error.MissingField("platform");
+      if (string.IsNullOrEmpty(databaseEntry.Passphrase)) Error.MissingField("passphrase");
+      if (string.IsNullOrEmpty(databaseEntry.Url)) Error.MissingField("url");
+      if (string.IsNullOrEmpty(databaseEntry.Identity)) Error.MissingField("identity");
+      return databaseEntry;
     }
 
     public static ConstantPair ConstantPair(ConstantPair entry)

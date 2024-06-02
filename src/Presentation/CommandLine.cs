@@ -38,6 +38,9 @@ namespace Passenger
         case "update" or "-u": worker.Update(); break;
         case "delete" or "-d": worker.Delete(); break;
         case "stats" or "-s": worker.Statistics(); break;
+        case "declare" or "-D": worker.Declare(); break;
+        case "forget" or "-F": worker.Forget(); break;
+        case "constants" or "-C": worker.Constants(); break;
         case "generate" or "-g": worker.Generate(); break;
         case "manipulate" or "-m": worker.Manipulate(); break;
         case "version" or "-v" or "--version": Worker.Version(); break;
@@ -123,6 +126,16 @@ namespace Passenger
     public static void MissingField(string field)
     {
       Console.WriteLine($"passenger: missing field '{field}'");
+      Environment.Exit(1);
+    }
+
+    /// <summary>
+    /// Constant exists
+    /// </summary>
+    /// <param name="constant"></param>
+    public static void ConstantExists(ConstantPair constant)
+    {
+      Console.WriteLine($"passenger: constant '{constant.Key}' already exists");
       Environment.Exit(1);
     }
 

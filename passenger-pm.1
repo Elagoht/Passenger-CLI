@@ -69,6 +69,24 @@ Show statistics of the Passenger client, requires a JWT token.
 .B passenger stats [jwt]
 .RE
 .TP
+.BR declare " \-D"
+Declare a new key-value pair, requires a JWT token. Theses pairs are constant values that can be replaced on response.
+.RS
+.B passenger declare [jwt] [key] [value]
+.RE
+.TP
+.BR forget " \-F"
+Forget a key-value pair by its key, requires a JWT token.
+.RS
+.B passenger forget [jwt] [key]
+.RE
+.TP
+.BR constants " \-C"
+List all key-value pairs, requires a JWT token.
+.RS
+.B passenger constants [jwt]
+.RE
+.TP
 .BR generate " \-g"
 Generate a passphrase with the given length, requires a JWT token.
 .RS
@@ -85,7 +103,6 @@ Manipulate a passphrase by changing characters looking similar to others.
 Show the version of the Passenger software.
 .RS
 .B passenger version 
-
 .RE
 .TP
 .BR help " \-h" " \-\-help"

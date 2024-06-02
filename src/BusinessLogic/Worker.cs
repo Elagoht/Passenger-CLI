@@ -115,7 +115,7 @@ namespace Passenger
     public void Fetch()
     {
       RoutineAuthControl("fetch", 2);
-      var entry = Database.FetchOne(arguments[1]);
+      DatabaseEntry entry = Database.FetchOne(arguments[1]);
       if (entry == null) Error.EntryNotFound();
       entry.TotalAccesses++;
       Database.Update(entry.Id, entry, false);
@@ -197,6 +197,45 @@ namespace Passenger
         StrongPassphrases = statistics.StrongPassphrases
       };
       Console.WriteLine(JsonSerializer.Serialize(dashboardData));
+    }
+
+    /*
+     * Constant pairs
+     */
+
+    /// <summary> 
+    /// Declare a new key-value pair constant
+    /// </summary>
+    public void Declare()
+    {
+      RoutineAuthControl("declare", 3);
+      ConstantPair constantPair = new()
+      {
+        Key = arguments[1],
+        Value = arguments[2]
+      };
+      Validate.ConstantPair(constantPair);
+      Database.DeclareConstant(constantPair);
+    }
+
+    /// <summary>
+    /// Forget a key-value pair constant
+    /// </summary>
+    public void Forget()
+    {
+      RoutineAuthControl("forget", 2);
+      Database.ForgetConstant(arguments[1]);
+    }
+
+    /// <summary>
+    /// List all declared constants
+    /// </summary>
+    public void Constants()
+    {
+      RoutineAuthControl("constants", 1);
+      Console.WriteLine(
+        JsonSerializer.Serialize(Database.AllConstants)
+      );
     }
 
     /*
@@ -306,9 +345,23 @@ COMMANDS
             Delete an entry by its UUID, requires a JWT token.
             passenger delete [jwt] [uuid]
 
-      statis -s
+      stats -s
             Show statistics of the database.
             passenger statis [jwt]
+
+      declare -D
+            Declare a new key-value pair, requires a JWT token.
+            Theses pairs are constant values that can be replaced
+            on response.
+            passenger declare [jwt] [key] [value]
+
+      forget -F
+            Forget a key-value pair, requires a JWT token.
+            passenger forget [jwt] [key]
+
+      constants -C
+            List all declared constants, requires a JWT token.
+            passenger constants [jwt]
 
       generate -g
             Generate a passphrase with the given length.
@@ -370,6 +423,9 @@ Commands:
   update     -u [jwt] [uuid] [json]     : update an entry by its uuid
   delete     -d [jwt] [uuid]            : delete an entry by its index
   statis     -s [jwt]                   : show statistics of the database
+  declare    -D [jwt] [key] [value]     : declare a new key-value pair
+  forget     -F [jwt] [key]             : forget a key-value pair
+  constants  -C [jwt]                   : list all declared constants
   generate   -g [length]                : generate a passphrase with the given length
   manipulate -m [passphrase]            : manipulate a passphrase
   version    -v --version               : show the version and exit

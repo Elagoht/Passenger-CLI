@@ -104,7 +104,7 @@ namespace Passenger
     {
       int score = -1;
 
-      foreach (var criteria in Criterias)
+      foreach (KeyValuePair<StrengthCriteria, Regex> criteria in Criterias)
         if (criteria.Value.IsMatch(password))
           score += CriteriaScores[criteria.Key];
 
@@ -115,9 +115,9 @@ namespace Passenger
 
     public static Dictionary<string, bool> Evaluate(string password)
     {
-      var result = new Dictionary<string, bool>();
+      Dictionary<string, bool> result = [];
 
-      foreach (var criteria in Criterias)
+      foreach (KeyValuePair<StrengthCriteria, Regex> criteria in Criterias)
         result[CriteriaMessages[criteria.Key]] = criteria.Value.IsMatch(password);
 
       return result;

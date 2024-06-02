@@ -93,6 +93,7 @@ namespace Passenger
       database.Passphrase = passphrase;
       database.Username = username;
       database.Entries = [];
+      database.Constants = [];
       SaveToFile();
     }
 
@@ -129,6 +130,7 @@ namespace Passenger
       entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
       entry.Updated = entry.Created;
       // Append entry to database and save
+      database.Entries ??= [];
       database.Entries.Add(entry);
       SaveToFile();
       return JsonSerializer.Serialize(entry);
@@ -153,8 +155,12 @@ namespace Passenger
     /// <remarks>
     /// This method fetches one entry from the database.
     /// </remarks>
-    public static DatabaseEntry FetchOne(string id) => database.Entries
-      .Find(entry => entry.Id == id);
+    public static DatabaseEntry FetchOne(string id)
+    {
+      DatabaseEntry entry = database.Entries.Find(entry => entry.Id == id);
+      entry.Identity = ResolveConstant(entry.Identity);
+      return entry;
+    }
 
     /// <summary>
     /// Query entries
@@ -168,14 +174,8 @@ namespace Passenger
         (entry.Platform != null && entry.Platform.Contains(keyword)) ||
         (entry.Identity != null && entry.Identity.Contains(keyword)) ||
         (entry.Url != null && entry.Url.Contains(keyword))
-      ).Select(entry => new ListableDatabaseEntry
-      {
-        Id = entry.Id,
-        Platform = entry.Platform,
-        Identity = entry.Identity,
-        Url = entry.Url
-      }
-    ).ToList();
+      ).Select(ConvertEntryToListable
+      ).ToList();
 
     /// <summary>
     /// Update entry
@@ -187,7 +187,7 @@ namespace Passenger
     /// </remarks>
     public static void Update(string id, DatabaseEntry entry, bool preserveUpdated = true)
     {
-      var index = database.Entries.FindIndex(entry => entry.Id == id);
+      int index = database.Entries.FindIndex(entry => entry.Id == id);
       if (index == -1) Error.EntryNotFound();
       entry = Validate.Entry(entry);
 
@@ -216,6 +216,65 @@ namespace Passenger
       SaveToFile();
     }
 
+    /*
+     * Constants pair methods
+     */
+
+    /// <summary>
+    /// Declare constant pair
+    /// </summary>
+    /// <param name="entry">Constant pair entry</param>
+    public static void DeclareConstant(ConstantPair entry)
+    {
+      Validate.ConstantPair(entry);
+      database.Constants ??= [];
+      database.Constants.Add(entry);
+      SaveToFile();
+    }
+
+    /// <summary>
+    /// Fetch constant pair
+    /// </summary>
+    /// <param name="constant">Constant key</param>
+    /// <returns>Constant pair</returns>
+    public static ConstantPair FetchConstant(string constant) =>
+      (database.Constants ?? []).Find(pair =>
+        pair.Key == constant
+      );
+
+    /// <summary>
+    /// Forget constant pair
+    /// </summary>
+    /// <param name="constant">Constant key</param>
+    public static void ForgetConstant(string constant)
+    {
+      if (FetchConstant(constant) == null) Error.EntryNotFound();
+      database.Constants.RemoveAll((pair) =>
+        pair.Key == constant
+      );
+      SaveToFile();
+    }
+
+    /// <summary>
+    /// Get all constants
+    /// </summary>
+    /// <returns>List of constant pairs</returns>
+    public static List<ConstantPair> AllConstants => database.Constants ?? [];
+
+    /// <summary>
+    /// Resolve constant
+    /// </summary>
+    /// <param name="constant">Constant key</param>
+    /// <returns>Constant value</returns>
+    public static string ResolveConstant(string key) =>
+      AllConstants.Find((pair) =>
+        $"_${pair.Key}" == key
+      )?.Value ?? key;
+
+    /*
+     * Conversion methods
+     */
+
     /// <summary>
     /// Get All Entries
     /// </summary>
@@ -237,7 +296,7 @@ namespace Passenger
     {
       Id = entry.Id,
       Platform = entry.Platform,
-      Identity = entry.Identity,
+      Identity = ResolveConstant(entry.Identity),
       Url = entry.Url,
       Created = entry.Created,
       Updated = entry.Updated,
@@ -277,46 +336,6 @@ namespace Passenger
   }
 
   /// <summary>
-  /// Validation methods for Passenger
-  /// </summary>
-  /// <remarks>
-  /// This class provides validation methods for database entries.
-  /// </remarks>
-  public static class Validate
-  {
-    /// <summary>
-    /// Validate entry
-    /// </summary>
-    /// <param name="entry">Database entry</param>
-    /// <returns>Validated database entry</returns>
-    /// <remarks>
-    /// This method validates a database entry and auto-generates created and updated fields.
-    /// </remarks>
-    public static DatabaseEntry Entry(DatabaseEntry entry)
-    {
-      // Check if required fields are provided
-      if (string.IsNullOrEmpty(entry.Platform)) Error.MissingField("platform");
-      if (string.IsNullOrEmpty(entry.Passphrase)) Error.MissingField("passphrase");
-      if (string.IsNullOrEmpty(entry.Url)) Error.MissingField("url");
-      if (string.IsNullOrEmpty(entry.Identity)) Error.MissingField("identity");
-      return entry;
-    }
-
-    /// <summary>
-    /// Validate JSON as database entry
-    /// </summary>
-    /// <param name="json">JSON string</param>
-    /// <remarks>
-    /// Validates and parses a JSON string as a database entry else exits the program with an error.
-    /// </remarks>
-    public static DatabaseEntry JsonAsDatabaseEntry(string json)
-    {
-      try { return JsonSerializer.Deserialize<DatabaseEntry>(json); }
-      catch { Error.JsonParseError(); return null; }
-    }
-  }
-
-  /// <summary>
   /// Database model for Passenger
   /// </summary>
   /// <remarks>
@@ -348,6 +367,22 @@ namespace Passenger
     /// </summary>
     [JsonPropertyName("entries")]
     public List<DatabaseEntry> Entries { get; set; }
+    /// <summary>
+    /// A list of constants in the database
+    /// </summary>
+    [JsonPropertyName("constants")]
+    public List<ConstantPair> Constants { get; set; }
+  }
+
+  /// <summary>
+  /// Key-value pair for constants to use short names on the database
+  /// </summary>
+  public class ConstantPair
+  {
+    [JsonPropertyName("key"), Required]
+    public string Key { get; set; }
+    [JsonPropertyName("value"), Required]
+    public string Value { get; set; }
   }
 
   public class MicroDatabaseEntry

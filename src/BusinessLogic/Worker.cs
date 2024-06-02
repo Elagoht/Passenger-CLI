@@ -2,24 +2,11 @@ using System.Text.Json;
 
 namespace Passenger
 {
-  /// <summary>
-  /// Main work handler
-  /// </summary>
-  /// <param name="args"></param>
-  /// <remarks>
-  /// This class is responsible for handling the main work of the program.
-  /// </remarks>
   public class Worker(string[] args)
   {
     private readonly Authorization authorization = new(EnDeCoder.JSWSecret);
     private readonly string[] arguments = args.Skip(1).ToArray();
 
-    /// <summary>
-    /// Verb control routine
-    /// </summary>
-    /// <remarks>
-    /// This method is responsible for controlling the verbs and their respective methods.
-    /// </remarks>
     private void RoutineAuthControl(string verbName, int requiredArgs)
     {
       if (arguments.Length != requiredArgs) Error.ArgumentCount(verbName, requiredArgs);
@@ -30,12 +17,6 @@ namespace Passenger
      * Authorization
      */
 
-    /// <summary>
-    /// Login
-    /// </summary>
-    /// <remarks>
-    /// Generate a JWT token to use other commands. Requires a passphrase.
-    /// </remarks>
     public void Login()
     {
       if (arguments.Length != 2) Error.ArgumentCount("login", 2);
@@ -43,12 +24,6 @@ namespace Passenger
       Environment.Exit(0);
     }
 
-    /// <summary>
-    /// Register
-    /// </summary>
-    /// <remarks>
-    /// Register a passphrase to database.
-    /// </remarks>
     public void Register()
     {
       if (arguments.Length != 2) Error.ArgumentCount("register", 2);
@@ -58,12 +33,6 @@ namespace Passenger
         Database.Register(arguments[0], arguments[1]);
     }
 
-    /// <summary>
-    /// Reset passphrase for accessing database
-    /// </summary>
-    /// <remarks>
-    /// Reset the passphrase of the Passenger client using a JWT token and a new passphrase.
-    /// </remarks>
     public void Reset()
     {
       RoutineAuthControl("reset", 2);
@@ -74,13 +43,6 @@ namespace Passenger
      * CRUD operations
      */
 
-    /// <summary>
-    /// Create a new entry
-    /// </summary>
-    /// <param name="entry"></param>
-    /// <remarks>
-    /// Store an entry with the given data, requires a JWT token.
-    /// </remarks>
     public void Create()
     {
       RoutineAuthControl("create", 2);
@@ -90,13 +52,6 @@ namespace Passenger
       Console.WriteLine(Database.Create(entry));
     }
 
-    /// <summary>
-    /// Fetch all entries without passphrases
-    /// </summary>
-    /// <returns>A list of all entries</returns>
-    /// <remarks>
-    /// List all entries without displaying their passphrases, requires a JWT token.
-    /// </remarks>
     public void FetchAll()
     {
       RoutineAuthControl("fetchAll", 1);
@@ -105,13 +60,6 @@ namespace Passenger
       );
     }
 
-    /// <summary>
-    /// Fetch one entry by UUID
-    /// </summary>
-    /// <returns>DatabaseEntry</returns>
-    /// <remarks>
-    /// Retrieve an entry by its UUID and increment its total accesses, requires a JWT token.
-    /// </remarks>
     public void Fetch()
     {
       RoutineAuthControl("fetch", 2);
@@ -122,13 +70,6 @@ namespace Passenger
       Console.WriteLine(JsonSerializer.Serialize(entry));
     }
 
-    /// <summary>
-    /// Query entries by keyword
-    /// </summary>
-    /// <returns>A list of entries</returns>
-    /// <remarks>
-    /// Search for a keyword in all entries, requires a JWT token.
-    /// </remarks>
     public void Query()
     {
       RoutineAuthControl("query", 2);
@@ -139,12 +80,6 @@ namespace Passenger
       );
     }
 
-    /// <summary>
-    /// Update an entry
-    /// </summary>
-    /// <remarks>
-    /// Update an entry by its UUID, requires a JWT token and JSON formatted data.
-    /// </remarks>
     public void Update()
     {
       RoutineAuthControl("update", 3);
@@ -153,12 +88,6 @@ namespace Passenger
       Database.Update(arguments[1], entry);
     }
 
-    /// <summary>
-    /// Delete an entry
-    /// </summary>
-    /// <remarks>
-    /// Delete an entry by its UUID, requires a JWT token.
-    /// </remarks>
     public void Delete()
     {
       RoutineAuthControl("delete", 2);
@@ -169,12 +98,6 @@ namespace Passenger
      * Statistics
      */
 
-    /// <summary>
-    /// Show statistics
-    /// </summary>
-    /// <remarks>
-    /// Show statistics of the database.
-    /// </remarks>
     public void Statistics()
     {
       RoutineAuthControl("statistics", 1);
@@ -203,9 +126,6 @@ namespace Passenger
      * Constant pairs
      */
 
-    /// <summary> 
-    /// Declare a new key-value pair constant
-    /// </summary>
     public void Declare()
     {
       RoutineAuthControl("declare", 3);
@@ -218,18 +138,12 @@ namespace Passenger
       Database.DeclareConstant(constantPair);
     }
 
-    /// <summary>
-    /// Forget a key-value pair constant
-    /// </summary>
     public void Forget()
     {
       RoutineAuthControl("forget", 2);
       Database.ForgetConstant(arguments[1]);
     }
 
-    /// <summary>
-    /// List all declared constants
-    /// </summary>
     public void Constants()
     {
       RoutineAuthControl("constants", 1);
@@ -242,13 +156,6 @@ namespace Passenger
      * Generation
      */
 
-    /// <summary>
-    /// Generate a passphrase
-    /// </summary>
-    /// <returns>A secure random passphrase</returns>
-    /// <remarks>
-    /// Generate a passphrase with the given length. Default length is 32.
-    /// </remarks>
     public void Generate()
     {
       switch (arguments.Length)
@@ -263,13 +170,6 @@ namespace Passenger
       }
     }
 
-    /// <summary>
-    /// Manipulate a passphrase
-    /// </summary>
-    /// <returns>A manipulated passphrase</returns>
-    /// <remarks>
-    /// Manipulate a passphrase by changing its characters. Still recognizable by humans.
-    /// </remarks>
     public void Manipulate()
     {
       if (arguments.Length != 1) Error.ArgumentCount("manipulate", 1);
@@ -280,12 +180,6 @@ namespace Passenger
      * Help and manual
      */
 
-    /// <summary>
-    /// Show manual
-    /// </summary>
-    /// <remarks>
-    /// Manual page with UNIX style, plain text to support Windows.
-    /// </remarks>
     public static void Manual()
     {
       Console.WriteLine($@"PASSENGER(1)                 Passenger CLI Manual                 PASSENGER(1)
@@ -396,12 +290,6 @@ SEE ALSO
       Environment.Exit(0);
     }
 
-    /// <summary>
-    /// Show help
-    /// </summary>
-    /// <remarks>
-    /// Show help message and exit.
-    /// </remarks>
     public static void Help()
     {
       Console.Write(@$"Passenger CLI {GlobalConstants.VERSION}

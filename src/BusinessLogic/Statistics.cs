@@ -22,8 +22,8 @@ namespace Passenger
       entry.Passphrase
     ).Distinct().Count();
 
-    public CountableDatabaseEntry[] MostAccessed => entries.OrderByDescending(entry =>
-      entry.TotalAccesses
+    public CountableDatabaseEntry[] MostAccessed => entries.OrderByDescending(
+      entry => entry.TotalAccesses
     ).Take(5
     ).Select(Database.ConvertEntryToCountable
     ).ToArray();
@@ -36,9 +36,9 @@ namespace Passenger
       ).Select(Database.ConvertEntryToMicro
       ).ToArray();
 
-      if (commonPassword.Length > 1)
-        return commonPassword;
-      return null;
+      return commonPassword.Length > 1
+        ? commonPassword
+        : null;
     }).Where(commonPassword =>
       commonPassword != null
     ).ToArray();

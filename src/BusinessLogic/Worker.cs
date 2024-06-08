@@ -138,6 +138,27 @@ namespace Passenger
       Database.DeclareConstant(constantPair);
     }
 
+    public void Modify()
+    {
+      RoutineAuthControl("modify", 4);
+      ConstantPair newPair = new()
+      {
+        Key = arguments[2],
+        Value = arguments[3]
+      };
+      Validate.ConstantPair(newPair);
+      Database.ModifyConstant(arguments[1], newPair);
+    }
+
+    public void Remember()
+    {
+      RoutineAuthControl("remember", 2);
+      Console.WriteLine(JsonSerializer.Serialize(
+        Database.FetchConstant(arguments[1])
+      ));
+    }
+
+
     public void Forget()
     {
       RoutineAuthControl("forget", 2);
@@ -249,6 +270,14 @@ COMMANDS
             on response.
             passenger declare [jwt] [key] [value]
 
+      modify -M
+            Modify a key-value pair, requires a JWT token.
+            passenger modify [jwt] [key] [value]
+
+      remember -R
+            Fetch a key-value pair, requires a JWT token.
+            passenger remember [jwt] [key]
+
       forget -F
             Forget a key-value pair, requires a JWT token.
             passenger forget [jwt] [key]
@@ -312,7 +341,9 @@ Commands:
   delete     -d [jwt] [uuid]            : delete an entry by its index
   statis     -s [jwt]                   : show statistics of the database
   declare    -D [jwt] [key] [value]     : declare a new key-value pair
-  forget     -F [jwt] [key]             : forget a key-value pair
+  modify     -M [jwt] [key] [value]     : modify a key-value pair
+  remember   -R [jwt] [key] [value]     : fetch a key-value pair
+  forget     -F [jwt] [key]             : delete a key-value pair
   constants  -C [jwt]                   : list all declared constants
   generate   -g [length]                : generate a passphrase with the given length
   manipulate -m [passphrase]            : manipulate a passphrase

@@ -134,18 +134,30 @@ namespace Passenger
      * Constants pair methods
      */
 
-    public static void DeclareConstant(ConstantPair entry)
+    public static ConstantPair DeclareConstant(ConstantPair entry)
     {
       Validate.ConstantPair(entry);
       database.Constants ??= [];
       database.Constants.Add(entry);
       SaveToFile();
+      return entry;
     }
 
     public static ConstantPair FetchConstant(string constant) =>
       (database.Constants ?? []).Find(pair =>
         pair.Key == constant
       );
+
+    public static ConstantPair ModifyConstant(string key, ConstantPair newPair)
+    {
+      if (FetchConstant(key) == null) Error.EntryNotFound();
+      Validate.ConstantPair(newPair);
+      database.Constants[database.Constants.FindIndex(pair =>
+        pair.Key == key
+      )] = newPair;
+      SaveToFile();
+      return newPair;
+    }
 
     public static void ForgetConstant(string constant)
     {

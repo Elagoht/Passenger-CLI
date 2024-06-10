@@ -92,12 +92,8 @@ namespace Passenger
       ConvertEntryToListable
     ).ToList();
 
-    public static DatabaseEntry FetchOne(string id)
-    {
-      DatabaseEntry entry = database.Entries.Find(entry => entry.Id == id);
-      entry.Identity = ResolveConstant(entry.Identity);
-      return entry;
-    }
+    public static DatabaseEntry FetchOne(string id) =>
+      database.Entries.Find(entry => entry.Id == id);
 
     public static List<ListableDatabaseEntry> Query(string keyword) => database.Entries.Where(entry =>
         (entry.Platform != null && entry.Platform.Contains(keyword)) ||

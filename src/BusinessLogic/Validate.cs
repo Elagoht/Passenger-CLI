@@ -14,11 +14,12 @@ namespace Passenger
       return databaseEntry;
     }
 
-    public static ConstantPair ConstantPair(ConstantPair entry)
+    public static ConstantPair ConstantPair(ConstantPair entry, bool checkExistence = true)
     {
       // Check if required fields are provided
       if (string.IsNullOrEmpty(entry.Key)) Error.MissingField("key");
       if (string.IsNullOrEmpty(entry.Value)) Error.MissingField("value");
+      if (!checkExistence) return entry;
       if (Database.FetchConstant(entry.Key) != null) Error.ConstantExists(entry);
       return entry;
     }

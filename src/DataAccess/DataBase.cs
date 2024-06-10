@@ -151,7 +151,7 @@ namespace Passenger
     public static ConstantPair ModifyConstant(string key, ConstantPair newPair)
     {
       if (FetchConstant(key) == null) Error.EntryNotFound();
-      Validate.ConstantPair(newPair);
+      Validate.ConstantPair(newPair, false);
       database.Constants[database.Constants.FindIndex(pair =>
         pair.Key == key
       )] = newPair;

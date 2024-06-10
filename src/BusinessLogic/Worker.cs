@@ -146,7 +146,6 @@ namespace Passenger
         Key = arguments[2],
         Value = arguments[3]
       };
-      Validate.ConstantPair(newPair);
       Database.ModifyConstant(arguments[1], newPair);
     }
 

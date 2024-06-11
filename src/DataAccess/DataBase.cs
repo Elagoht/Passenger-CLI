@@ -76,7 +76,7 @@ namespace Passenger
 
     public static string Create(DatabaseEntry entry)
     {
-      entry = Validate.Entry(entry);
+      Validate.Entry(entry);
       // Auto-generate id
       entry.Id = Guid.NewGuid().ToString();
       entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -106,7 +106,7 @@ namespace Passenger
     {
       int index = database.Entries.FindIndex(entry => entry.Id == id);
       if (index == -1) Error.EntryNotFound();
-      entry = Validate.Entry(entry);
+      Validate.Entry(entry);
 
       // Protect private fields
       DatabaseEntry currentEntry = database.Entries[index];

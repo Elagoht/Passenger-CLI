@@ -62,6 +62,12 @@ namespace Passenger
       Environment.Exit(1);
     }
 
+    public static void FoundOnRepository()
+    {
+      Console.WriteLine("passenger: your password is on a brute-force repository, not saved");
+      Environment.Exit(1);
+    }
+
     public static void FileExceptions(Exception exception)
     {
       switch (exception)

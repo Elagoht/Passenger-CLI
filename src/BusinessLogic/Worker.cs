@@ -48,6 +48,10 @@ namespace Passenger
       RoutineAuthControl("create", 2);
       DatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[1]);
       Validate.Entry(entry);
+      Validate.IfIsOnRepository(
+        PasswordRepository.Load(),
+        entry.Passphrase
+      );
       entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
       Console.WriteLine(Database.Create(entry));
     }

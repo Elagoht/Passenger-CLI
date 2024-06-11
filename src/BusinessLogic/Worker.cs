@@ -152,11 +152,10 @@ namespace Passenger
     public void Remember()
     {
       RoutineAuthControl("remember", 2);
-      Console.WriteLine(JsonSerializer.Serialize(
-        Database.FetchConstant(arguments[1])
-      ));
+      ConstantPair constantPair = Database.FetchConstant(arguments[1]);
+      if (constantPair == null) Error.EntryNotFound();
+      Console.WriteLine(JsonSerializer.Serialize(constantPair));
     }
-
 
     public void Forget()
     {

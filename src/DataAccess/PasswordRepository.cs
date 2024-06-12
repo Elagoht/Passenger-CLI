@@ -4,12 +4,13 @@ namespace Passenger
 {
   public static class PasswordRepository
   {
-    public static List<string> Load()
+    public static List<string> Load(ushort length)
     {
       List<string> passwordList = [];
-      Assembly assembly = Assembly.GetExecutingAssembly();
 
-      using (Stream stream = assembly.GetManifestResourceStream("Passenger.passwords.bin"))
+      using (Stream stream = Assembly
+        .GetExecutingAssembly()
+        .GetManifestResourceStream($"Passenger.passwords_{length}.bin"))
       {
         if (stream == null) throw new Exception("Resource not found.");
         using var binaryReader = new BinaryReader(stream);

@@ -12,7 +12,7 @@ namespace Passenger
         .GetExecutingAssembly()
         .GetManifestResourceStream($"Passenger.passwords_{length}.bin"))
       {
-        if (stream == null) throw new Exception("Resource not found.");
+        if (stream == null) return passwordList;
         using var binaryReader = new BinaryReader(stream);
         int count = binaryReader.ReadInt32();
         for (int cursor = 0; cursor < count; cursor++)

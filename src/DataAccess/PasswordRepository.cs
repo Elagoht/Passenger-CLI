@@ -6,8 +6,9 @@ namespace Passenger
   {
     public static List<string> Load()
     {
-      var passwordList = new List<string>();
-      var assembly = Assembly.GetExecutingAssembly();
+      List<string> passwordList = [];
+      Assembly assembly = Assembly.GetExecutingAssembly();
+
       using (Stream stream = assembly.GetManifestResourceStream("Passenger.passwords.bin"))
       {
         if (stream == null) throw new Exception("Resource not found.");

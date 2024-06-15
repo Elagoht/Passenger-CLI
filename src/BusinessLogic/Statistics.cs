@@ -8,9 +8,11 @@ namespace Passenger
 
     public int TotalCount => entries.Length;
 
-    public double AverageLength => entries.Select(entry =>
-      entry.Passphrase.Length
-    ).Sum() / TotalCount;
+    public double AverageLength => TotalCount == 0
+      ? 0
+      : entries.Select(entry =>
+        entry.Passphrase.Length
+      ).Sum() / TotalCount;
 
     public string[] UniquePlatforms => entries.Select(entry =>
       entry.Platform
@@ -43,22 +45,28 @@ namespace Passenger
       commonPassword != null
     ).ToArray();
 
-    public double PercentageOfCommon => CommonByPlatform.SelectMany(commonPassword =>
-      commonPassword
-    ).Distinct().Count() / TotalCount;
+    public double PercentageOfCommon => TotalCount == 0
+      ? 0
+      : CommonByPlatform.SelectMany(commonPassword =>
+        commonPassword
+      ).Distinct().Count() / TotalCount;
 
-    public string MostCommon => entries.GroupBy(entry =>
-      entry.Passphrase
-    ).OrderByDescending(group =>
-      group.Count()
-    ).First().Key;
+    public string MostCommon => TotalCount == 0
+      ? "Not available"
+      : entries.GroupBy(entry =>
+        entry.Passphrase
+      ).OrderByDescending(group =>
+        group.Count()
+      ).First().Key;
 
     public Dictionary<string, int> Strengths => entries.ToDictionary(entry =>
       entry.Id,
       entry => Strength.Calculate(entry.Passphrase)
     );
 
-    public double AverageStrength => Strengths.Values.Average();
+    public double AverageStrength => TotalCount == 0
+      ? -2
+      : Strengths.Values.Average();
 
     public MicroDatabaseEntry[] WeakPassphrases => [..entries.Where(entry =>
       Strengths[entry.Id] < 4

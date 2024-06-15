@@ -68,6 +68,18 @@ namespace Passenger
       Environment.Exit(1);
     }
 
+    public static void PassphraseTooShort()
+    {
+      Console.WriteLine("passenger: passphrase must be at least 8 characters long");
+      Environment.Exit(1);
+    }
+
+    public static void PassphraseTooLong()
+    {
+      Console.WriteLine("passenger: more than 4096 characters passphrases are not supported");
+      Environment.Exit(1);
+    }
+
     public static void FileExceptions(Exception exception)
     {
       switch (exception)

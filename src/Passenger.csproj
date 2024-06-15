@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.6.0" />
-    <EmbeddedResource Include="passwords.bin" />
+    <EmbeddedResource Include="resources\**\*" />
   </ItemGroup>
 
 </Project>

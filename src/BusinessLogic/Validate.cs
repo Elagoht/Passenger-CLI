@@ -11,6 +11,8 @@ namespace Passenger
       if (string.IsNullOrEmpty(databaseEntry.Passphrase)) Error.MissingField("passphrase");
       if (string.IsNullOrEmpty(databaseEntry.Url)) Error.MissingField("url");
       if (string.IsNullOrEmpty(databaseEntry.Identity)) Error.MissingField("identity");
+      Validate.PassphraseLength(databaseEntry.Passphrase);
+      Validate.IfIsOnRepository(databaseEntry.Passphrase);
     }
 
     public static void ConstantPair(ConstantPair entry, bool checkExistence = true)

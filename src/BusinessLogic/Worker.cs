@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace Passenger
 {
-  public class Worker(string[] args)
+  public class Worker(string[] args, string secretKey = null)
   {
     private readonly Authorization authorization = new(EnDeCoder.JSWSecret);
     private readonly string[] arguments = args.Skip(1).ToArray();
@@ -48,8 +48,6 @@ namespace Passenger
       RoutineAuthControl("create", 2);
       DatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[1]);
       Validate.Entry(entry);
-      Validate.PassphraseLength(entry.Passphrase);
-      Validate.IfIsOnRepository(entry.Passphrase);
       entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
       Console.WriteLine(Database.Create(entry));
     }

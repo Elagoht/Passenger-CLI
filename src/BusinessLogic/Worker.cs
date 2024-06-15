@@ -102,7 +102,7 @@ namespace Passenger
 
     public void Statistics()
     {
-      RoutineAuthControl("statistics", 1);
+      RoutineAuthControl("stats", 1);
       Statistics statistics = new(Database.AllEntries);
       DashboardData dashboardData = new()
       {

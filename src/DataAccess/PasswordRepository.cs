@@ -7,20 +7,15 @@ namespace Passenger
     public static List<string> Load(int length)
     {
       List<string> passwordList = [];
+      string resourceName = $"Passenger.resources.passwords_{length}.txt";
 
-      using (Stream stream = Assembly
-          .GetExecutingAssembly()
-          .GetManifestResourceStream($"Passenger.resources.passwords_{length}.bin"))
+      using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
       {
         if (stream == null) return passwordList;
-        using var binaryReader = new BinaryReader(stream);
-        int count = binaryReader.ReadInt32();
-        for (int cursor = 0; cursor < count; ++cursor)
-        {
-          int passwordLength = binaryReader.ReadInt32();
-          byte[] passwordBytes = binaryReader.ReadBytes(passwordLength);
-          passwordList.Add(System.Text.Encoding.UTF8.GetString(passwordBytes));
-        }
+        using StreamReader reader = new(stream);
+        string line;
+        while ((line = reader.ReadLine()) != null)
+          passwordList.Add(line);
       }
       return passwordList;
     }

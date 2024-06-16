@@ -2,11 +2,11 @@ using System.Text.Json.Serialization;
 
 namespace Passenger
 {
-  public class Statistics(DatabaseEntry[] entries)
+  public class Statistics(List<ReadWritableDatabaseEntry> entries)
   {
-    private readonly DatabaseEntry[] entries = entries;
+    private readonly List<ReadWritableDatabaseEntry> entries = entries;
 
-    public int TotalCount => entries.Length;
+    public int TotalCount => entries.Count;
 
     public double AverageLength => TotalCount == 0
       ? 0
@@ -27,7 +27,7 @@ namespace Passenger
     public CountableDatabaseEntry[] MostAccessed => entries.OrderByDescending(
       entry => entry.TotalAccesses
     ).Take(5
-    ).Select(Database.ConvertEntryToCountable
+    ).Select(Mapper.ToCountable
     ).ToArray();
 
     public MicroDatabaseEntry[][] CommonByPlatform => entries.Select(entry =>
@@ -35,7 +35,7 @@ namespace Passenger
       MicroDatabaseEntry[] commonPassword = entries.Where(current =>
         current.Passphrase == entry.Passphrase
       ).OrderBy(entry => entry.Platform
-      ).Select(Database.ConvertEntryToMicro
+      ).Select(Mapper.ToMicro
       ).ToArray();
 
       return commonPassword.Length > 1
@@ -70,15 +70,15 @@ namespace Passenger
 
     public MicroDatabaseEntry[] WeakPassphrases => [..entries.Where(entry =>
       Strengths[entry.Id] < 4
-    ).Select(Database.ConvertEntryToMicro)];
+    ).Select(Mapper.ToMicro)];
 
     public MicroDatabaseEntry[] MediumPassphrases => [..entries.Where(entry =>
       Strengths[entry.Id] >= 4 && Strengths[entry.Id] <= 5
-    ).Select(Database.ConvertEntryToMicro)];
+    ).Select(Mapper.ToMicro)];
 
     public MicroDatabaseEntry[] StrongPassphrases => [..entries.Where(entry =>
       Strengths[entry.Id] > 5
-    ).Select(Database.ConvertEntryToMicro)];
+    ).Select(Mapper.ToMicro)];
   }
 
   public class DashboardData

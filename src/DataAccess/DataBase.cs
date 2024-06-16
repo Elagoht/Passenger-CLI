@@ -71,7 +71,7 @@ namespace Passenger
      * CRUD operations
      */
 
-    public static string Create(DatabaseEntry entry)
+    public static string Create(ReadWritableDatabaseEntry entry)
     {
       Validate.Entry(entry);
       // Auto-generate id
@@ -79,42 +79,54 @@ namespace Passenger
       entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
       entry.Updated = entry.Created;
       // Append entry to database and save
-      database.Entries ??= [];
-      database.Entries.Add(entry);
+      database.Entries.Add(Mapper.NewlyCreated(entry));
       SaveToFile();
       return JsonSerializer.Serialize(entry);
     }
 
-    public static List<ListableDatabaseEntry> FetchAll() => database.Entries.Select(
-      ConvertEntryToListable
-    ).ToList();
+    public static List<ListableDatabaseEntry> FetchAll() =>
+      database.Entries.Select(
+        Mapper.ToListable
+      ).ToList();
 
-    public static DatabaseEntry FetchOne(string id) =>
-      database.Entries.Find(entry => entry.Id == id);
+    public static ReadWritableDatabaseEntry FetchOne(string id) =>
+      Mapper.ToReadWritable(
+        database.Entries.Find(entry => entry.Id == id)
+      );
 
-    public static List<ListableDatabaseEntry> Query(string keyword) => database.Entries.Where(entry =>
+    public static List<ListableDatabaseEntry> Query(string keyword) =>
+      database.Entries.Where(entry =>
         (entry.Platform != null && entry.Platform.Contains(keyword)) ||
         (entry.Identity != null && entry.Identity.Contains(keyword)) ||
         (entry.Url != null && entry.Url.Contains(keyword))
-      ).Select(ConvertEntryToListable
+      ).Select(Mapper.ToListable
       ).ToList();
 
-    public static void Update(string id, DatabaseEntry entry, bool preserveUpdated = true)
+    public static ListableDatabaseEntry Update(string id, ReadWritableDatabaseEntry updatedEntry, bool preserveUpdatedAt = true)
     {
       int index = database.Entries.FindIndex(entry => entry.Id == id);
       if (index == -1) Error.EntryNotFound();
-      Validate.Entry(entry);
+      DatabaseEntry existingEntry = database.Entries[index];
 
-      // Protect private fields
-      DatabaseEntry currentEntry = database.Entries[index];
-      entry.Id = currentEntry.Id;
-      entry.Created = currentEntry.Created;
-      entry.Updated = preserveUpdated
-        ? currentEntry.Updated
+      // Update changes
+      existingEntry.Platform = updatedEntry.Platform;
+      existingEntry.Url = updatedEntry.Url;
+      existingEntry.Identity = updatedEntry.Identity;
+      existingEntry.Notes = updatedEntry.Notes;
+      existingEntry.TotalAccesses = updatedEntry.TotalAccesses;
+      // Preserve the updated at timestamp if requested
+      existingEntry.Updated = preserveUpdatedAt
+        ? existingEntry.Updated
         : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-      entry.TotalAccesses = currentEntry.TotalAccesses; // Do not increase
-      database.Entries[index] = entry;
+      // If passphrase is updated, append to history
+      if (existingEntry.Passphrases.Last().Passphrase != updatedEntry.Passphrase)
+        existingEntry.Passphrases = Mapper.RegisterNewPassphrase(
+          existingEntry.Passphrases,
+          updatedEntry.Passphrase
+        );
       SaveToFile();
+
+      return Mapper.ToListable(existingEntry);
     }
 
     public static void Delete(string id)
@@ -161,43 +173,17 @@ namespace Passenger
       SaveToFile();
     }
 
-    public static List<ConstantPair> AllConstants => database.Constants ?? [];
-
-    public static string ResolveConstant(string key) =>
-      AllConstants.Find((pair) =>
-        $"_${pair.Key}" == key
-      )?.Value ?? key;
-
     /*
-     * Conversion methods
+     * Getters
      */
 
-    public static DatabaseEntry[] AllEntries => [.. database.Entries];
+    public static List<ConstantPair> AllConstants => database.Constants ?? [];
 
-    public static ListableDatabaseEntry ConvertEntryToListable(DatabaseEntry entry) => new()
-    {
-      Id = entry.Id,
-      Platform = entry.Platform,
-      Identity = ResolveConstant(entry.Identity),
-      Url = entry.Url,
-      Created = entry.Created,
-      Updated = entry.Updated,
-      TotalAccesses = entry.TotalAccesses
-    };
+    public static List<DatabaseEntry> AllEntries => database.Entries;
 
-    public static CountableDatabaseEntry ConvertEntryToCountable(DatabaseEntry entry) => new()
-    {
-      Platform = entry.Platform,
-      Id = entry.Id,
-      Url = entry.Url,
-      TotalAccesses = entry.TotalAccesses
-    };
-
-    public static MicroDatabaseEntry ConvertEntryToMicro(DatabaseEntry entry) => new()
-    {
-      Platform = entry.Platform,
-      Id = entry.Id,
-      Url = entry.Url
-    };
+    public static List<ReadWritableDatabaseEntry> AllReadWritableEntries =>
+      database.Entries.Select(
+        Mapper.ToReadWritable
+      ).ToList();
   }
 }

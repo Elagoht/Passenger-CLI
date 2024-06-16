@@ -46,7 +46,7 @@ namespace Passenger
     public void Create()
     {
       RoutineAuthControl("create", 2);
-      DatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[1]);
+      ReadWritableDatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[1]);
       Validate.Entry(entry);
       entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
       Console.WriteLine(Database.Create(entry));
@@ -63,7 +63,7 @@ namespace Passenger
     public void Fetch()
     {
       RoutineAuthControl("fetch", 2);
-      DatabaseEntry entry = Database.FetchOne(arguments[1]);
+      ReadWritableDatabaseEntry entry = Database.FetchOne(arguments[1]);
       if (entry == null) Error.EntryNotFound();
       entry.TotalAccesses++;
       Database.Update(entry.Id, entry, false);
@@ -83,9 +83,13 @@ namespace Passenger
     public void Update()
     {
       RoutineAuthControl("update", 3);
-      DatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[2]);
+      ReadWritableDatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[2]);
       Validate.Entry(entry);
-      Database.Update(arguments[1], entry);
+      Console.WriteLine(
+        JsonSerializer.Serialize(
+          Database.Update(arguments[1], entry)
+        )
+      );
     }
 
     public void Delete()
@@ -101,7 +105,7 @@ namespace Passenger
     public void Statistics()
     {
       RoutineAuthControl("stats", 1);
-      Statistics statistics = new(Database.AllEntries);
+      Statistics statistics = new(Database.AllReadWritableEntries);
       DashboardData dashboardData = new()
       {
         TotalCount = statistics.TotalCount,

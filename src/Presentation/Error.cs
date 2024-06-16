@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+
 namespace Passenger
 {
   public static class Error
@@ -104,6 +106,9 @@ namespace Passenger
           Environment.Exit(126); break;
         case IOException:
           Console.WriteLine("passenger: data file input/output error");
+          Environment.Exit(1); break;
+        case AuthenticationTagMismatchException:
+          Console.WriteLine("passenger: Authentication cannot be verified");
           Environment.Exit(1); break;
         default:
           Console.WriteLine("passenger: unexpected error while accessing data file");

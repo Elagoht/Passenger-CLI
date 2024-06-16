@@ -32,6 +32,18 @@ namespace Passenger
       Environment.Exit(1);
     }
 
+    public static void SecretKeyNotProvided()
+    {
+      Console.WriteLine("passenger: secret key not provided");
+      Environment.Exit(1);
+    }
+
+    public static void DatabaseLoadFailed()
+    {
+      Console.WriteLine("passenger: failed to load or decrypt database");
+      Environment.Exit(1);
+    }
+
     public static void MissingField(string field)
     {
       Console.WriteLine($"passenger: missing field '{field}'");

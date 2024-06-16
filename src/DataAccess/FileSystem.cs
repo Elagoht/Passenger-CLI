@@ -23,12 +23,11 @@ namespace Passenger
     {
       try
       {
-        File.WriteAllText(fileName,
+        File.WriteAllText(
+          fileName,
           Crypto.EncryptData(
             secretKey,
-            EnDeCoder.Encode(
-              data
-            )
+            EnDeCoder.Encode(data)
           )
         );
       }

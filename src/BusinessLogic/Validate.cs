@@ -4,7 +4,7 @@ namespace Passenger
 {
   public static class Validate
   {
-    public static void Entry(DatabaseEntry databaseEntry)
+    public static void Entry(ReadWritableDatabaseEntry databaseEntry)
     {
       // Check if required fields are provided
       if (string.IsNullOrEmpty(databaseEntry.Platform)) Error.MissingField("platform");
@@ -24,9 +24,9 @@ namespace Passenger
       if (Database.FetchConstant(entry.Key) != null) Error.ConstantExists(entry);
     }
 
-    public static DatabaseEntry JsonAsDatabaseEntry(string json)
+    public static ReadWritableDatabaseEntry JsonAsDatabaseEntry(string json)
     {
-      try { return JsonSerializer.Deserialize<DatabaseEntry>(json); }
+      try { return JsonSerializer.Deserialize<ReadWritableDatabaseEntry>(json); }
       catch { Error.JsonParseError(); return null; }
     }
 

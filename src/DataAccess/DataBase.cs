@@ -10,14 +10,13 @@ namespace Passenger
     {
       try
       {
-        string data = File.Exists(databaseFile) ? FileSystem.Read(databaseFile) : "{}";
-        database = JsonSerializer.Deserialize<DatabaseModel>(data) ?? new DatabaseModel { Entries = [] };
+        string data = File.Exists(databaseFile)
+          ? FileSystem.Read(databaseFile)
+          : "{}";
+        database = JsonSerializer.Deserialize<DatabaseModel>(data)
+          ?? new DatabaseModel { Entries = [] };
       }
-      catch
-      {
-        Console.WriteLine("passenger: failed to load database");
-        Environment.Exit(1);
-      }
+      catch { Error.DatabaseLoadFailed(); }
     }
 
     /*

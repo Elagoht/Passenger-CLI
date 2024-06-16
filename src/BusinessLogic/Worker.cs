@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace Passenger
 {
-  public class Worker(string[] args, string secretKey = null)
+  public class Worker(string[] args)
   {
     private readonly Authorization authorization = new(EnDeCoder.JSWSecret);
     private readonly string[] arguments = args.Skip(1).ToArray();

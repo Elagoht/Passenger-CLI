@@ -70,10 +70,19 @@ namespace Passenger
     public string Updated { get; set; }
   }
 
-  /// <summary>Maximum details to use on CRUD operations</summary>
-  public class DatabaseEntry : ListableDatabaseEntry
+  /// <summary>Single passphrase entry to use on read and write operations</summary>
+  public class ReadWritableDatabaseEntry : ListableDatabaseEntry
   {
     [JsonPropertyName("passphrase"), Required]
+    public string Passphrase { get; set; }
+    [JsonPropertyName("notes")] // Optional
+    public string Notes { get; set; }
+  }
+
+  /// <summary>Maximum detailed model to save on database file</summary>
+  public class DatabaseEntry : ListableDatabaseEntry
+  {
+    [JsonPropertyName("passphrases"), Required]
     public List<TrackablePassphrase> Passphrases { get; set; }
     [JsonPropertyName("notes")] // Optional
     public string Notes { get; set; }

@@ -114,14 +114,15 @@ namespace Passenger
       existingEntry.Identity = updatedEntry.Identity;
       existingEntry.Notes = updatedEntry.Notes;
       existingEntry.TotalAccesses = updatedEntry.TotalAccesses;
+      existingEntry.Passphrase = updatedEntry.Passphrase;
       // Preserve the updated at timestamp if requested
       existingEntry.Updated = preserveUpdatedAt
         ? existingEntry.Updated
         : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
       // If passphrase is updated, append to history
-      if (existingEntry.Passphrases.Last().Passphrase != updatedEntry.Passphrase)
-        existingEntry.Passphrases = Mapper.RegisterNewPassphrase(
-          existingEntry.Passphrases,
+      if (existingEntry.Passphrase != updatedEntry.Passphrase)
+        existingEntry.PassphraseHistory = Mapper.RegisterNewPassphrase(
+          existingEntry.PassphraseHistory,
           updatedEntry.Passphrase
         );
       SaveToFile();

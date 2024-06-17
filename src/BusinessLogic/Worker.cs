@@ -63,7 +63,14 @@ namespace Passenger
     public void Fetch()
     {
       RoutineAuthControl("fetch", 2);
-      ReadWritableDatabaseEntry entry = Database.FetchOne(arguments[1]);
+      /**
+       * Fetch can read passphrase history as well.
+       * Don't worry, it's not a security issue.
+       * Because passphrase history only tracks
+       * the stats of the passphrase, not the
+       * passphrase itself.
+       */
+      DatabaseEntry entry = Database.Fetch(arguments[1]);
       if (entry == null) Error.EntryNotFound();
       entry.TotalAccesses++;
       Database.Update(entry.Id, entry, false);

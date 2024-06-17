@@ -11,27 +11,22 @@ namespace Passenger
       Created = entry.Created,
       Updated = entry.Updated,
       TotalAccesses = entry.TotalAccesses,
-      Passphrases = [new() { Passphrase = entry.Passphrase, Updated = entry.Updated }],
+      Passphrase = entry.Passphrase,
+      PassphraseHistory = [
+        new() {
+          Created = entry.Created,
+          Length= entry.Passphrase.Length,
+          Strength = Strength.Calculate(entry.Passphrase)
+        }
+      ],
       Notes = entry.Notes
     };
-
-    public static List<TrackablePassphrase> RegisterNewPassphrase(
-      List<TrackablePassphrase> passphrases,
-      string passphrase
-    ) => [
-      .. passphrases,
-      new() {
-        Passphrase = passphrase,
-        Updated = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
-      }
-    ];
 
     public static ReadWritableDatabaseEntry ToReadWritable(DatabaseEntry entry) => new()
     {
       Id = entry.Id,
       Platform = entry.Platform,
-      // Get the last set passphrase
-      Passphrase = entry.Passphrases.Last().Passphrase,
+      Passphrase = entry.Passphrase,
       Url = entry.Url,
       Identity = entry.Identity,
       Created = entry.Created,

@@ -89,10 +89,8 @@ namespace Passenger
         Mapper.ToListable
       ).ToList();
 
-    public static ReadWritableDatabaseEntry FetchOne(string id) =>
-      Mapper.ToReadWritable(
-        database.Entries.Find(entry => entry.Id == id)
-      );
+    public static DatabaseEntry Fetch(string id) =>
+        database.Entries.Find(entry => entry.Id == id);
 
     public static List<ListableDatabaseEntry> Query(string keyword) =>
       database.Entries.Where(entry =>
@@ -108,7 +106,7 @@ namespace Passenger
       if (index == -1) Error.EntryNotFound();
       DatabaseEntry existingEntry = database.Entries[index];
 
-      // Update changes
+      // Update fields
       existingEntry.Platform = updatedEntry.Platform;
       existingEntry.Url = updatedEntry.Url;
       existingEntry.Identity = updatedEntry.Identity;
@@ -119,11 +117,16 @@ namespace Passenger
         ? existingEntry.Updated
         : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
       // If passphrase is updated, append to history
-      if (existingEntry.Passphrases.Last().Passphrase != updatedEntry.Passphrase)
-        existingEntry.Passphrases = Mapper.RegisterNewPassphrase(
-          existingEntry.Passphrases,
-          updatedEntry.Passphrase
-        );
+      if (existingEntry.Passphrase != updatedEntry.Passphrase)
+      existingEntry.PassphraseHistory.Add(new()
+        {
+          Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+          Length= updatedEntry.Passphrase.Length,
+          Strength = Strength.Calculate(updatedEntry.Passphrase)
+        }
+      );
+      // After updating history, finally update the passphrase
+      existingEntry.Passphrase = updatedEntry.Passphrase;
       SaveToFile();
 
       return Mapper.ToListable(existingEntry);

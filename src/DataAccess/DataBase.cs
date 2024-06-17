@@ -89,10 +89,8 @@ namespace Passenger
         Mapper.ToListable
       ).ToList();
 
-    public static ReadWritableDatabaseEntry FetchOne(string id) =>
-      Mapper.ToReadWritable(
-        database.Entries.Find(entry => entry.Id == id)
-      );
+    public static DatabaseEntry Fetch(string id) =>
+        database.Entries.Find(entry => entry.Id == id);
 
     public static List<ListableDatabaseEntry> Query(string keyword) =>
       database.Entries.Where(entry =>

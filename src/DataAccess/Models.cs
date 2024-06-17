@@ -16,13 +16,15 @@ namespace Passenger
     public List<ConstantPair> Constants { get; set; }
   }
 
-  /// <summary>Model to track passphrase changes over time</summary>
+  /// <summary>Model to track passphrase statistics changes over time</summary>
   public class TrackablePassphrase
   {
-    [JsonPropertyName("passphrase"), Required]
-    public string Passphrase { get; set; }
-    [JsonPropertyName("updated"), Required]
-    public string Updated { get; set; }
+    [JsonPropertyName("strength"), Required]
+    public int Strength { get; set; }
+    [JsonPropertyName("length"), Required]
+    public int Length { get; set; }
+    [JsonPropertyName("created"), Required]
+    public string Created { get; set; }
   }
 
   /// <summary>Model to use on JWT related operations</summary>
@@ -70,7 +72,7 @@ namespace Passenger
     public string Updated { get; set; }
   }
 
-  /// <summary>Single passphrase entry to use on read and write operations</summary>
+  /// <summary>Details to use on read and write operations</summary>
   public class ReadWritableDatabaseEntry : ListableDatabaseEntry
   {
     [JsonPropertyName("passphrase"), Required]
@@ -80,11 +82,9 @@ namespace Passenger
   }
 
   /// <summary>Maximum detailed model to save on database file</summary>
-  public class DatabaseEntry : ListableDatabaseEntry
+  public class DatabaseEntry : ReadWritableDatabaseEntry
   {
-    [JsonPropertyName("passphrases"), Required]
-    public List<TrackablePassphrase> Passphrases { get; set; }
-    [JsonPropertyName("notes")] // Optional
-    public string Notes { get; set; }
+    [JsonPropertyName("passphraseHistory")]
+    public List<TrackablePassphrase> PassphraseHistory { get; set; }
   }
 }

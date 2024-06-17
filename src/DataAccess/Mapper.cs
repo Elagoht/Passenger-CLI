@@ -22,18 +22,6 @@ namespace Passenger
       Notes = entry.Notes
     };
 
-    public static List<TrackablePassphrase> RegisterNewPassphrase(
-      List<TrackablePassphrase> passphrases,
-      string passphrase
-    ) => [
-      .. passphrases,
-      new() {
-        Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-        Length = passphrase.Length,
-        Strength = Strength.Calculate(passphrase)
-      }
-    ];
-
     public static ReadWritableDatabaseEntry ToReadWritable(DatabaseEntry entry) => new()
     {
       Id = entry.Id,

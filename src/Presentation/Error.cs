@@ -123,7 +123,7 @@ namespace Passenger
           Console.WriteLine("passenger: Authentication cannot be verified");
           Environment.Exit(1); break;
         default:
-          Console.WriteLine("passenger: unexpected error while accessing data file");
+          Console.WriteLine($"passenger: unexpected error while accessing data file: {exception.Message}");
           Environment.Exit(2); break;
       }
     }

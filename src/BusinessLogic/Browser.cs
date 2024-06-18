@@ -58,7 +58,8 @@ namespace Passenger
         foreach (SafariFields record in records)
         {
           mappedEntries.Add(Mapper.CreateDatabaseEntry(
-            record.Title, record.Username, record.Url,
+            NormalizeApplePlatformName(record.Title),
+            record.Username, record.Url,
             record.Password, record.Notes
           ));
         }
@@ -67,12 +68,20 @@ namespace Passenger
 
       internal static string ConvertURLToPlatformName(string url)
       {
-        string[] hostParts = new Uri(url).Host.Split('.');
-        string rootDomain = hostParts.Length > 2
-          ? hostParts[^2]
-          : hostParts[0];
-        return char.ToUpper(rootDomain[0]) + rootDomain[1..];
+        string host = new Uri(url).Host.ToLower();
+        string[] parts = host.Split('.');
+        if (parts.Length > 2 && parts[^1].Length == 2)
+          host = parts[^3];
+        else if (parts.Length >= 2)
+          host = parts[^2];
+        return host[0].ToString().ToUpper() + host[1..];
       }
+
+      internal static string NormalizeApplePlatformName(string platform) =>
+        ConvertURLToPlatformName($"https://{(string.Join(
+          " ",
+          platform.Split(" (")[..^1]
+        ))}");
 
       internal class ChromiumFields
       {
@@ -127,11 +136,11 @@ namespace Passenger
       {
         public SafariMap()
         {
-          Map(model => model.Title).Name("title");
-          Map(model => model.Url).Name("url");
-          Map(model => model.Username).Name("username");
-          Map(model => model.Password).Name("password");
-          Map(model => model.Notes).Name("notes");
+          Map(model => model.Title).Name("Title");
+          Map(model => model.Url).Name("URL");
+          Map(model => model.Username).Name("Username");
+          Map(model => model.Password).Name("Password");
+          Map(model => model.Notes).Name("Notes");
         }
       }
     }

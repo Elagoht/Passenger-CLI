@@ -94,6 +94,18 @@ namespace Passenger
       Environment.Exit(1);
     }
 
+    public static void BrowserTypeNotSupported()
+    {
+      Console.WriteLine("passenger: browser type not supported");
+      Environment.Exit(1);
+    }
+
+    public static void ImportFailed()
+    {
+      Console.WriteLine("passenger: failed to import data");
+      Environment.Exit(1);
+    }
+
     public static void FileExceptions(Exception exception)
     {
       switch (exception)

@@ -22,6 +22,8 @@ namespace Passenger
         case "update" or "-u": worker.Update(); break;
         case "delete" or "-d": worker.Delete(); break;
         case "stats" or "-s": worker.Statistics(); break;
+        case "import" or "-i": worker.Import(); break;
+        case "export" or "-e": worker.Export(); break;
         case "declare" or "-D": worker.Declare(); break;
         case "modify" or "-M": worker.Modify(); break;
         case "remember" or "-R": worker.Remember(); break;

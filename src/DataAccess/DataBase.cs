@@ -71,17 +71,32 @@ namespace Passenger
      * CRUD operations
      */
 
-    public static string Create(ReadWritableDatabaseEntry entry)
+    public static ListableDatabaseEntry Create(ReadWritableDatabaseEntry entry)
     {
       Validate.Entry(entry);
-      // Auto-generate id
-      entry.Id = Guid.NewGuid().ToString();
-      entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-      entry.Updated = entry.Created;
-      // Append entry to database and save
-      database.Entries.Add(Mapper.AutoRegistered(entry));
+      DatabaseEntry savedEntry = Mapper.CreateDatabaseEntry(
+        entry.Platform, entry.Identity, entry.Url,
+        entry.Passphrase, entry.Notes
+      );
+      database.Entries.Add(savedEntry);
       SaveToFile();
-      return JsonSerializer.Serialize(entry);
+      return Mapper.ToListable(savedEntry);
+    }
+
+    /// <summary>Prevents re-reading and re-crypting the database file</summary>
+    public static string Import(List<DatabaseEntry> entries)
+    {
+      try
+      {
+        entries.ForEach(Validate.Entry);
+        entries.ForEach(database.Entries.Add);
+        SaveToFile();
+        return $"Imported {entries.Count} {(entries.Count == 1
+          ? "entry"
+          : "entries"
+        )} successfully.";
+      }
+      catch { Error.ImportFailed(); throw; }
     }
 
     public static List<ListableDatabaseEntry> FetchAll() =>

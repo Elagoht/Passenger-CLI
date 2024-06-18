@@ -46,18 +46,17 @@ namespace Passenger
     public void Create()
     {
       RoutineAuthControl("create", 2);
-      ReadWritableDatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[1]);
-      Validate.Entry(entry);
-      entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-      Console.WriteLine(Database.Create(entry));
+      Console.WriteLine(JsonSerializer.Serialize(
+        Database.Create(Validate.JsonAsDatabaseEntry(arguments[1]))
+      ));
     }
 
     public void FetchAll()
     {
       RoutineAuthControl("fetchAll", 1);
-      Console.WriteLine(
-        JsonSerializer.Serialize(Database.FetchAll())
-      );
+      Console.WriteLine(JsonSerializer.Serialize(
+        Database.FetchAll()
+      ));
     }
 
     public void Fetch()
@@ -132,6 +131,23 @@ namespace Passenger
       };
       Console.WriteLine(JsonSerializer.Serialize(dashboardData));
     }
+
+    /*
+     * Data transfer
+     */
+
+    public void Import()
+    {
+      RoutineAuthControl("import", 3);
+      if (!Browser.SupportedBrowsers.Contains(arguments[1]))
+        Error.BrowserTypeNotSupported();
+      Console.WriteLine(Database.Import(
+        Browser.Import(arguments[1], arguments[2])
+      ));
+    }
+
+    public void Export()
+    { }
 
     /*
      * Constant pairs
@@ -271,7 +287,20 @@ COMMANDS
 
       stats -s
             Show statistics of the database.
-            passenger statis [jwt]
+            passenger stats [jwt]
+
+      import -i
+            Import a CSV file from a browser, requires a JWT token.
+            Browser can be chromium, firefox, or safari.
+            You can export your passwords as a CSV file from your browser.
+            Accepts the CSV content as a string to support web services.
+            passenger import [jwt] [browser] [csv]
+
+      export -e
+            Export the database to a CSV file, requires a JWT token.
+            Method can be bare or encrypted. Base64 encryption will be used.
+            Writes to stdout, can be redirected to a file.
+            passenger export [jwt] [method]
 
       declare -D
             Declare a new key-value pair, requires a JWT token.
@@ -332,7 +361,7 @@ SEE ALSO
     {
       Console.Write(@$"Passenger CLI {GlobalConstants.VERSION}
   Copyright (C) 2024 Elagoht
-  
+
   Store, retrieve, manage and generate passphrases securely using your own encode/decode algorithm. Every passenger client is created by user's itself and unique.
 
 Usage:
@@ -348,7 +377,9 @@ Commands:
   create     -c [jwt] [json]            : store an entry with the given json
   update     -u [jwt] [uuid] [json]     : update an entry by its uuid
   delete     -d [jwt] [uuid]            : delete an entry by its index
-  statis     -s [jwt]                   : show statistics of the database
+  stats      -s [jwt]                   : show statistics of the database
+  import     -i [jwt] [browser] [csv]   : import [chromium], [firefox] or [safari] csv
+  export     -e [jwt] [method]          : export to [bare] or [encrypted] csv
   declare    -D [jwt] [key] [value]     : declare a new key-value pair
   modify     -M [jwt] [key] [value]     : modify a key-value pair
   remember   -R [jwt] [key] [value]     : fetch a key-value pair

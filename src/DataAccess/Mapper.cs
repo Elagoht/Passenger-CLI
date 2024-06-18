@@ -2,11 +2,6 @@ namespace Passenger
 {
   public static class Mapper
   {
-    public static DatabaseEntry AutoRegistered(ReadWritableDatabaseEntry entry) =>
-      CreateDatabaseEntry(
-        entry.Platform, entry.Identity, entry.Url, entry.Passphrase, entry.Notes
-      );
-
     public static ReadWritableDatabaseEntry ToReadWritable(DatabaseEntry entry) => new()
     {
       Id = entry.Id,
@@ -50,19 +45,19 @@ namespace Passenger
         $"_${pair.Key}" == key
       )?.Value ?? key;
 
-    public static DatabaseEntry CreateDatabaseEntry(string platform, string username, string url, string password, string notes = null)
+    public static DatabaseEntry CreateDatabaseEntry(string platform, string identity, string url, string passphrase, string notes = null)
     {
       return new DatabaseEntry
       {
         Id = Guid.NewGuid().ToString(),
         Platform = platform,
-        Identity = username,
+        Identity = identity,
         Url = url,
         Notes = notes,
-        Passphrase = password,
+        Passphrase = passphrase,
         PassphraseHistory = [new() {
-          Length = password.Length,
-          Strength = Strength.Calculate(password),
+          Length = passphrase.Length,
+          Strength = Strength.Calculate(passphrase),
           Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
         }],
         Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),

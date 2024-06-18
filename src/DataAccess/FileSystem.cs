@@ -1,3 +1,7 @@
+using System.Globalization;
+using CsvHelper;
+using CsvHelper.Configuration;
+
 namespace Passenger
 {
   public static class FileSystem
@@ -32,6 +36,27 @@ namespace Passenger
         );
       }
       catch (Exception exception) { Error.FileExceptions(exception); }
+    }
+
+    public static List<Type> ReadCSV<Type, TMap>(string fileName)
+      where TMap : ClassMap<Type>
+    {
+      try
+      {
+        using StreamReader reader = new(fileName);
+        using CsvReader csvReader = new(
+          reader,
+          new CsvConfiguration(CultureInfo.InvariantCulture)
+          {
+            MissingFieldFound = null,
+            HeaderValidated = null
+          }
+        );
+
+        csvReader.Context.RegisterClassMap<TMap>();
+        return csvReader.GetRecords<Type>().ToList();
+      }
+      catch (Exception exception) { Error.FileExceptions(exception); throw; }
     }
   }
 }

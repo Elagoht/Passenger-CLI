@@ -79,7 +79,7 @@ namespace Passenger
       entry.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
       entry.Updated = entry.Created;
       // Append entry to database and save
-      database.Entries.Add(Mapper.NewlyCreated(entry));
+      database.Entries.Add(Mapper.AutoRegistered(entry));
       SaveToFile();
       return JsonSerializer.Serialize(entry);
     }
@@ -118,13 +118,14 @@ namespace Passenger
         : DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
       // If passphrase is updated, append to history
       if (existingEntry.Passphrase != updatedEntry.Passphrase)
-      existingEntry.PassphraseHistory.Add(new()
-        {
-          Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-          Length= updatedEntry.Passphrase.Length,
-          Strength = Strength.Calculate(updatedEntry.Passphrase)
-        }
-      );
+        existingEntry.PassphraseHistory.Add(
+          new()
+          {
+            Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            Length = updatedEntry.Passphrase.Length,
+            Strength = Strength.Calculate(updatedEntry.Passphrase)
+          }
+        );
       // After updating history, finally update the passphrase
       existingEntry.Passphrase = updatedEntry.Passphrase;
       SaveToFile();

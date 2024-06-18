@@ -2,25 +2,10 @@ namespace Passenger
 {
   public static class Mapper
   {
-    public static DatabaseEntry NewlyCreated(ReadWritableDatabaseEntry entry) => new()
-    {
-      Id = entry.Id,
-      Platform = entry.Platform,
-      Url = entry.Url,
-      Identity = entry.Identity,
-      Created = entry.Created,
-      Updated = entry.Updated,
-      TotalAccesses = entry.TotalAccesses,
-      Passphrase = entry.Passphrase,
-      PassphraseHistory = [
-        new() {
-          Created = entry.Created,
-          Length= entry.Passphrase.Length,
-          Strength = Strength.Calculate(entry.Passphrase)
-        }
-      ],
-      Notes = entry.Notes
-    };
+    public static DatabaseEntry AutoRegistered(ReadWritableDatabaseEntry entry) =>
+      CreateDatabaseEntry(
+        entry.Platform, entry.Identity, entry.Url, entry.Passphrase, entry.Notes
+      );
 
     public static ReadWritableDatabaseEntry ToReadWritable(DatabaseEntry entry) => new()
     {
@@ -64,5 +49,26 @@ namespace Passenger
       Database.AllConstants.Find((pair) =>
         $"_${pair.Key}" == key
       )?.Value ?? key;
+
+    public static DatabaseEntry CreateDatabaseEntry(string platform, string username, string url, string password, string notes = null)
+    {
+      return new DatabaseEntry
+      {
+        Id = Guid.NewGuid().ToString(),
+        Platform = platform,
+        Identity = username,
+        Url = url,
+        Notes = notes,
+        Passphrase = password,
+        PassphraseHistory = [new() {
+          Length = password.Length,
+          Strength = Strength.Calculate(password),
+          Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+        }],
+        Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+        Updated = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+        TotalAccesses = 0,
+      };
+    }
   }
 }

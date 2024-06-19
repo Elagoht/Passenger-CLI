@@ -56,6 +56,7 @@ namespace Passenger
         csvReader.Context.RegisterClassMap<TMap>();
         return csvReader.GetRecords<Type>().ToList();
       }
+      catch (ReaderException) { Error.CSVFormatMissmatch(); throw; }
       catch (Exception exception) { Error.FileExceptions(exception); throw; }
     }
   }

@@ -1,3 +1,6 @@
+using System.Buffers.Text;
+using System.Text;
+
 namespace Passenger
 {
   public static class Mapper
@@ -44,6 +47,14 @@ namespace Passenger
       Database.AllConstants.Find((pair) =>
         $"_${pair.Key}" == key
       )?.Value ?? key;
+
+    public static string ToCSVLine(ReadWritableDatabaseEntry entry) =>
+      $"{entry.Platform},{entry.Url},{entry.Identity},{entry.Passphrase},{entry.Notes}";
+
+    public static string ToEncryptedCSVLine(ReadWritableDatabaseEntry entry) =>
+      Convert.ToBase64String(Encoding.UTF8.GetBytes(
+        ToCSVLine(entry)
+      ));
 
     public static DatabaseEntry CreateDatabaseEntry(string platform, string identity, string url, string passphrase, string notes = null)
     {

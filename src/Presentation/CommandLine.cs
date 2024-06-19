@@ -1,6 +1,6 @@
 namespace Passenger
 {
-  public class CommandLine(string[] args)
+  public class CommandLine(string[] args, string piped)
   {
     private readonly string command = args.Length > 0
       ? args[0]
@@ -9,7 +9,7 @@ namespace Passenger
     public void Parse()
     {
       if (command is null) Error.MissingCommand();
-      Worker worker = new(args);
+      Worker worker = new(args, piped);
       switch (command)
       {
         case "login" or "-l": worker.Login(); break;
@@ -22,6 +22,8 @@ namespace Passenger
         case "update" or "-u": worker.Update(); break;
         case "delete" or "-d": worker.Delete(); break;
         case "stats" or "-s": worker.Statistics(); break;
+        case "import" or "-i": worker.Import(); break;
+        case "export" or "-e": worker.Export(); break;
         case "declare" or "-D": worker.Declare(); break;
         case "modify" or "-M": worker.Modify(); break;
         case "remember" or "-R": worker.Remember(); break;

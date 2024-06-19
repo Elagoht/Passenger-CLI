@@ -8,22 +8,32 @@ namespace Passenger
     public const string Firefox = "firefox";
     public const string Safari = "safari";
 
-    public static readonly string[] SupportedBrowsers = [Chromium, Firefox, Safari];
+    public const string Bare = "bare";
+    public const string Encrypted = "encrypted";
 
-    public static List<DatabaseEntry> Import(string browser, string content)
-    {
-      return browser switch
+    public static readonly string[] SupportedBrowsers = [Chromium, Firefox, Safari];
+    public static readonly string[] exportTypes = [Bare, Encrypted];
+
+    public static List<DatabaseEntry> Import(string browser, string content) =>
+      browser switch
       {
         Chromium => ImportData.FromChromium(content),
         Firefox => ImportData.FromFirefox(content),
         Safari => ImportData.FromSafari(content),
         _ => throw new ArgumentException("Invalid browser type")
       };
-    }
 
-    public class ImportData
+    public static string Export(string exportType, List<ReadWritableDatabaseEntry> entries) =>
+      exportType switch
+      {
+        Bare => ExportData.ToBare(entries),
+        Encrypted => ExportData.ToEncrypted(entries),
+        _ => throw new ArgumentException("Invalid export type")
+      };
+
+    internal class ImportData
     {
-      public static List<DatabaseEntry> FromChromium(string content)
+      internal static List<DatabaseEntry> FromChromium(string content)
       {
         List<ChromiumFields> records = CSV.ReadTyped<ChromiumFields, ChromiumMap>(content);
         List<DatabaseEntry> mappedEntries = [];
@@ -35,7 +45,7 @@ namespace Passenger
         return mappedEntries;
       }
 
-      public static List<DatabaseEntry> FromFirefox(string content)
+      internal static List<DatabaseEntry> FromFirefox(string content)
       {
         List<FirefoxFields> records = CSV.ReadTyped<FirefoxFields, FirefoxMap>(content);
         List<DatabaseEntry> mappedEntries = [];
@@ -47,7 +57,7 @@ namespace Passenger
         return mappedEntries;
       }
 
-      public static List<DatabaseEntry> FromSafari(string content)
+      internal static List<DatabaseEntry> FromSafari(string content)
       {
         List<SafariFields> records = CSV.ReadTyped<SafariFields, SafariMap>(content);
         List<DatabaseEntry> mappedEntries = [];
@@ -137,6 +147,17 @@ namespace Passenger
           Map(model => model.Notes).Name("Notes");
         }
       }
+    }
+
+    internal class ExportData
+    {
+      internal static string ToBare(List<ReadWritableDatabaseEntry> entries) =>
+        "name,url,username,password,note\n" +
+        string.Join("\n", entries.Select(Mapper.ToCSVLine));
+
+      internal static string ToEncrypted(List<ReadWritableDatabaseEntry> entries) =>
+        "bmFtZSx1cmwsdXNlcm5hbWUscGFzc3dvcmQsbm90ZQ==\n" +
+        string.Join("\n", entries.Select(Mapper.ToEncryptedCSVLine));
     }
   }
 }

@@ -100,6 +100,12 @@ namespace Passenger
       Environment.Exit(1);
     }
 
+    public static void ExportTypeNotSupported()
+    {
+      Console.WriteLine("passenger: export type not supported");
+      Environment.Exit(1);
+    }
+
     public static void ImportFailed()
     {
       Console.WriteLine("passenger: failed to import data");

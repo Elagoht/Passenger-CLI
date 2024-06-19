@@ -2,15 +2,21 @@ using System.Text.Json;
 
 namespace Passenger
 {
-  public class Worker(string[] args)
+  public class Worker(string[] args, string piped)
   {
     private readonly Authorization authorization = new(EnDeCoder.JSWSecret);
     private readonly string[] arguments = args.Skip(1).ToArray();
+    private readonly string piped = piped;
 
     private void RoutineAuthControl(string verbName, int requiredArgs)
     {
       if (arguments.Length != requiredArgs) Error.ArgumentCount(verbName, requiredArgs);
       if (!authorization.ValidateToken(arguments[0])) Error.InvalidToken();
+    }
+
+    private void RequirePipedInput()
+    {
+      if (piped == null) Error.PipedInputRequired();
     }
 
     /*
@@ -91,11 +97,9 @@ namespace Passenger
       RoutineAuthControl("update", 3);
       ReadWritableDatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[2]);
       Validate.Entry(entry);
-      Console.WriteLine(
-        JsonSerializer.Serialize(
-          Database.Update(arguments[1], entry)
-        )
-      );
+      Console.WriteLine(JsonSerializer.Serialize(
+        Database.Update(arguments[1], entry)
+      ));
     }
 
     public void Delete()

@@ -106,6 +106,12 @@ namespace Passenger
       Environment.Exit(1);
     }
 
+    public static void PipedInputRequired()
+    {
+      Console.WriteLine("passenger: Input not provided");
+      Environment.Exit(1);
+    }
+
     public static void CSVFormatMissmatch()
     {
       Console.WriteLine("passenger: CSV format mismatched with the specified browser");

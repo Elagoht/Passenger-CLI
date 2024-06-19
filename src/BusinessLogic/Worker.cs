@@ -152,7 +152,14 @@ namespace Passenger
     }
 
     public void Export()
-    { }
+    {
+      RoutineAuthControl("export", 2);
+      if (!Browser.exportTypes.Contains(arguments[1]))
+        Error.ExportTypeNotSupported();
+      Console.WriteLine(Browser.Export(
+        arguments[1], Database.AllReadWritableEntries
+      ));
+    }
 
     /*
      * Constant pairs

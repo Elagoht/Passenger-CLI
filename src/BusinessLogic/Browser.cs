@@ -8,61 +8,55 @@ namespace Passenger
     public const string Firefox = "firefox";
     public const string Safari = "safari";
 
-    public static readonly string[] SupportedBrowsers = { Chromium, Firefox, Safari };
+    public static readonly string[] SupportedBrowsers = [Chromium, Firefox, Safari];
 
-    public static List<DatabaseEntry> Import(string browser, string path)
+    public static List<DatabaseEntry> Import(string browser, string content)
     {
       return browser switch
       {
-        Chromium => ImportData.FromChromium(path),
-        Firefox => ImportData.FromFirefox(path),
-        Safari => ImportData.FromSafari(path),
+        Chromium => ImportData.FromChromium(content),
+        Firefox => ImportData.FromFirefox(content),
+        Safari => ImportData.FromSafari(content),
         _ => throw new ArgumentException("Invalid browser type")
       };
     }
 
     public class ImportData
     {
-      public static List<DatabaseEntry> FromChromium(string path)
+      public static List<DatabaseEntry> FromChromium(string content)
       {
-        List<ChromiumFields> records = FileSystem.ReadCSV<ChromiumFields, ChromiumMap>(path);
+        List<ChromiumFields> records = CSV.ReadTyped<ChromiumFields, ChromiumMap>(content);
         List<DatabaseEntry> mappedEntries = [];
         foreach (ChromiumFields record in records)
-        {
           mappedEntries.Add(Mapper.CreateDatabaseEntry(
             record.Name, record.Username, record.Url,
             record.Password, record.Note
           ));
-        }
         return mappedEntries;
       }
 
-      public static List<DatabaseEntry> FromFirefox(string path)
+      public static List<DatabaseEntry> FromFirefox(string content)
       {
-        List<FirefoxFields> records = FileSystem.ReadCSV<FirefoxFields, FirefoxMap>(path);
+        List<FirefoxFields> records = CSV.ReadTyped<FirefoxFields, FirefoxMap>(content);
         List<DatabaseEntry> mappedEntries = [];
         foreach (FirefoxFields record in records)
-        {
           mappedEntries.Add(Mapper.CreateDatabaseEntry(
             ConvertURLToPlatformName(record.Url),
             record.Username, record.Url, record.Password
           ));
-        }
         return mappedEntries;
       }
 
-      public static List<DatabaseEntry> FromSafari(string path)
+      public static List<DatabaseEntry> FromSafari(string content)
       {
-        List<SafariFields> records = FileSystem.ReadCSV<SafariFields, SafariMap>(path);
+        List<SafariFields> records = CSV.ReadTyped<SafariFields, SafariMap>(content);
         List<DatabaseEntry> mappedEntries = [];
         foreach (SafariFields record in records)
-        {
           mappedEntries.Add(Mapper.CreateDatabaseEntry(
             NormalizeApplePlatformName(record.Title),
             record.Username, record.Url,
             record.Password, record.Notes
           ));
-        }
         return mappedEntries;
       }
 
@@ -78,10 +72,10 @@ namespace Passenger
       }
 
       internal static string NormalizeApplePlatformName(string platform) =>
-        ConvertURLToPlatformName($"https://{(string.Join(
+        ConvertURLToPlatformName($"https://{string.Join(
           " ",
           platform.Split(" (")[..^1]
-        ))}");
+        )}");
 
       internal class ChromiumFields
       {

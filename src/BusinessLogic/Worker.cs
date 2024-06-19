@@ -142,11 +142,12 @@ namespace Passenger
 
     public void Import()
     {
-      RoutineAuthControl("import", 3);
+      RoutineAuthControl("import", 2);
+      RequirePipedInput();
       if (!Browser.SupportedBrowsers.Contains(arguments[1]))
         Error.BrowserTypeNotSupported();
       Console.WriteLine(Database.Import(
-        Browser.Import(arguments[1], arguments[2])
+        Browser.Import(arguments[1], piped)
       ));
     }
 

@@ -106,6 +106,12 @@ namespace Passenger
       Environment.Exit(1);
     }
 
+    public static void CSVFormatMissmatch()
+    {
+      Console.WriteLine("passenger: CSV format mismatched with the specified browser");
+      Environment.Exit(1);
+    }
+
     public static void FileExceptions(Exception exception)
     {
       switch (exception)
@@ -123,7 +129,7 @@ namespace Passenger
           Console.WriteLine("passenger: Authentication cannot be verified");
           Environment.Exit(1); break;
         default:
-          Console.WriteLine($"passenger: unexpected error while accessing data file: {exception.Message}");
+          Console.WriteLine("passenger: unexpected error while accessing data file");
           Environment.Exit(2); break;
       }
     }

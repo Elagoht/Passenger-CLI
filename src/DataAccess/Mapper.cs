@@ -56,9 +56,8 @@ namespace Passenger
         ToCSVLine(entry)
       ));
 
-    public static DatabaseEntry CreateDatabaseEntry(string platform, string identity, string url, string passphrase, string notes = null)
-    {
-      return new DatabaseEntry
+    public static DatabaseEntry CreateDatabaseEntry(string platform, string identity, string url, string passphrase, string notes = null) =>
+      new()
       {
         Id = Guid.NewGuid().ToString(),
         Platform = platform,
@@ -75,6 +74,5 @@ namespace Passenger
         Updated = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
         TotalAccesses = 0,
       };
-    }
   }
 }

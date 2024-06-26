@@ -88,7 +88,6 @@ namespace Passenger
     {
       try
       {
-        entries.ForEach(Validate.Entry);
         entries.ForEach(database.Entries.Add);
         SaveToFile();
         return $"Imported {entries.Count} {(entries.Count == 1

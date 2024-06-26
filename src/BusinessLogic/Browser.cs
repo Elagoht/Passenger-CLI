@@ -14,7 +14,7 @@ namespace Passenger
     public static readonly string[] SupportedBrowsers = [Chromium, Firefox, Safari];
     public static readonly string[] exportTypes = [Bare, Encrypted];
 
-    public static List<DatabaseEntry> Import(string browser, string content) =>
+    public static List<DatabaseEntry>[] Import(string browser, string content) =>
       browser switch
       {
         Chromium => ImportData.FromChromium(content),
@@ -33,41 +33,48 @@ namespace Passenger
 
     internal class ImportData
     {
-      internal static List<DatabaseEntry> FromChromium(string content)
-      {
-        List<ChromiumFields> records = CSV.ReadTyped<ChromiumFields, ChromiumMap>(content);
-        List<DatabaseEntry> mappedEntries = [];
-        foreach (ChromiumFields record in records)
-          mappedEntries.Add(Mapper.CreateDatabaseEntry(
+      internal static List<DatabaseEntry>[] FromChromium(string content) =>
+        ProcessRecords(
+          CSV.ReadTyped<ChromiumFields, ChromiumMap>(content),
+          (record) => Mapper.CreateDatabaseEntry(
             record.Name, record.Username, record.Url,
             record.Password, record.Note
-          ));
-        return mappedEntries;
-      }
+          )
+        );
 
-      internal static List<DatabaseEntry> FromFirefox(string content)
-      {
-        List<FirefoxFields> records = CSV.ReadTyped<FirefoxFields, FirefoxMap>(content);
-        List<DatabaseEntry> mappedEntries = [];
-        foreach (FirefoxFields record in records)
-          mappedEntries.Add(Mapper.CreateDatabaseEntry(
+
+      internal static List<DatabaseEntry>[] FromFirefox(string content) =>
+        ProcessRecords(
+          CSV.ReadTyped<FirefoxFields, FirefoxMap>(content),
+          (record) => Mapper.CreateDatabaseEntry(
             ConvertURLToPlatformName(record.Url),
             record.Username, record.Url, record.Password
-          ));
-        return mappedEntries;
-      }
+          )
+        );
 
-      internal static List<DatabaseEntry> FromSafari(string content)
-      {
-        List<SafariFields> records = CSV.ReadTyped<SafariFields, SafariMap>(content);
-        List<DatabaseEntry> mappedEntries = [];
-        foreach (SafariFields record in records)
-          mappedEntries.Add(Mapper.CreateDatabaseEntry(
+      internal static List<DatabaseEntry>[] FromSafari(string content) =>
+        ProcessRecords(
+          CSV.ReadTyped<SafariFields, SafariMap>(content),
+          (record) => Mapper.CreateDatabaseEntry(
             NormalizeApplePlatformName(record.Title),
             record.Username, record.Url,
             record.Password, record.Notes
-          ));
-        return mappedEntries;
+          )
+        );
+
+      internal static List<DatabaseEntry>[] ProcessRecords<T>(List<T> records, Func<T, DatabaseEntry> createEntryFunc)
+      {
+        List<DatabaseEntry> mappedEntries = [];
+        List<DatabaseEntry> skippedEntries = [];
+        foreach (T record in records)
+        {
+          DatabaseEntry created = createEntryFunc(record);
+          if (Validate.EntryFields(created))
+            mappedEntries.Add(created);
+          else
+            skippedEntries.Add(created);
+        }
+        return [mappedEntries, skippedEntries];
       }
 
       internal static string ConvertURLToPlatformName(string url)
@@ -153,7 +160,7 @@ namespace Passenger
     {
       internal static string ToBare(List<ReadWritableDatabaseEntry> entries) =>
         "name,url,username,password,note\n" +
-        string.Join("\n", entries.Select(Mapper.ToCSVLine));
+        string.Join("", entries.Select(Mapper.ToCSVLine));
 
       internal static string ToEncrypted(List<ReadWritableDatabaseEntry> entries) =>
         "bmFtZSx1cmwsdXNlcm5hbWUscGFzc3dvcmQsbm90ZQ==\n" +

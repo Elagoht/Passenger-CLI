@@ -8,10 +8,12 @@ namespace Passenger
     private readonly string[] arguments = args.Skip(1).ToArray();
     private readonly string piped = piped;
 
-    private void RoutineAuthControl(string verbName, int requiredArgs)
+    private void RoutineAuthControl(string verbName, int minOrActual, int max = -1)
     {
-      if (arguments.Length != requiredArgs) Error.ArgumentCount(verbName, requiredArgs);
-      if (!authorization.ValidateToken(arguments[0])) Error.InvalidToken();
+      if (arguments.Length < minOrActual || (max != -1 && arguments.Length > max))
+        Error.ArgumentCount(verbName, minOrActual, max);
+      if (!authorization.ValidateToken(arguments[0]))
+        Error.InvalidToken();
     }
 
     private void RequirePipedInput()
@@ -142,13 +144,35 @@ namespace Passenger
 
     public void Import()
     {
-      RoutineAuthControl("import", 2);
+      RoutineAuthControl("import", 2, 3);
       RequirePipedInput();
+      // Check if browser typeis supported
       if (!Browser.SupportedBrowsers.Contains(arguments[1]))
         Error.BrowserTypeNotSupported();
-      Console.WriteLine(Database.Import(
-        Browser.Import(arguments[1], piped)
-      ));
+
+      // Get imported and skipped entries
+      List<DatabaseEntry>[] data = Browser.Import(arguments[1], piped);
+      List<DatabaseEntry> mappedEntries = data[0];
+      List<DatabaseEntry> skippedEntries = data[1];
+
+      if (skippedEntries.Count == 0)
+      {
+        Console.WriteLine(Database.Import(mappedEntries));
+        return;
+      }
+      /**
+       * User can pipe the stdout to a file to import
+       * or stderr to see the skipped entries to fix them.
+       */
+      Console.Error.WriteLine(
+        "Skipped entries:\nname,url,username,password,note\n" +
+        string.Join('\n', skippedEntries.Select(Mapper.ToCSVLine)) +
+        "\nOther entries are acceptable.\n"
+      );
+      Console.WriteLine(
+        "name,url,username,password,note\n" +
+        string.Join('\n', mappedEntries.Select(Mapper.ToCSVLine))
+      );
     }
 
     public void Export()
@@ -305,8 +329,16 @@ COMMANDS
             Import a CSV file from a browser, requires a JWT token.
             Browser can be chromium, firefox, or safari.
             You can export your passwords as a CSV file from your browser.
-            Accepts the CSV content as a string to support web services.
-            passenger import [jwt] [browser] [csv]
+            Accepts the CSV content as piped input to support custom clients.
+
+            If your csv file have entries that Passenger would not accept,
+            you will get the skipped entries on stderr, and acceptable entries
+            on stdout. Acceptable entries will be stored in the database unless
+            you add them again.
+
+            Accaptable entries can be piped to a file to import from it.
+
+            cat passwords.csv | passenger import [jwt] [browser]
 
       export -e
             Export the database to a CSV file, requires a JWT token.
@@ -390,8 +422,8 @@ Commands:
   update     -u [jwt] [uuid] [json]     : update an entry by its uuid
   delete     -d [jwt] [uuid]            : delete an entry by its index
   stats      -s [jwt]                   : show statistics of the database
-  import     -i [jwt] [browser] [csv]   : import [chromium], [firefox] or [safari] csv
-  export     -e [jwt] [method]          : export to [bare] or [encrypted] csv
+  import     -i [jwt] [browser]         : import `chromium`, `firefox` or `safari` csv
+  export     -e [jwt] [method]          : export to `bare` or `encrypted` csv
   declare    -D [jwt] [key] [value]     : declare a new key-value pair
   modify     -M [jwt] [key] [value]     : modify a key-value pair
   remember   -R [jwt] [key] [value]     : fetch a key-value pair

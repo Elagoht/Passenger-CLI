@@ -94,6 +94,54 @@ namespace Passenger
       Environment.Exit(1);
     }
 
+    public static void BrowserTypeNotSupported()
+    {
+      Console.WriteLine("passenger: browser type not supported");
+      Environment.Exit(1);
+    }
+
+    public static void ExportTypeNotSupported()
+    {
+      Console.WriteLine("passenger: export type not supported");
+      Environment.Exit(1);
+    }
+
+    public static void ImportFailed()
+    {
+      Console.WriteLine("passenger: failed to import data");
+      Environment.Exit(1);
+    }
+
+    public static void ImportSkippedEntries(int count)
+    {
+      Console.WriteLine($"passenger: {(count > 1
+        ? $"{count} entries"
+        : "1 entry"
+      )} entries skipped due to short password");
+      Environment.Exit(1);
+    }
+
+    public static void ImportDenied(int count)
+    {
+      Console.WriteLine($"passenger: import denied due to {(count > 1
+        ? $"{count} entries"
+        : "1 entry"
+      )} with short password");
+      Environment.Exit(1);
+    }
+
+    public static void PipedInputRequired()
+    {
+      Console.WriteLine("passenger: Input not provided");
+      Environment.Exit(1);
+    }
+
+    public static void CSVFormatMissmatch()
+    {
+      Console.WriteLine("passenger: CSV format mismatched with the specified browser");
+      Environment.Exit(1);
+    }
+
     public static void FileExceptions(Exception exception)
     {
       switch (exception)

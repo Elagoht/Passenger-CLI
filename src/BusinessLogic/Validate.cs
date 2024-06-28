@@ -15,6 +15,17 @@ namespace Passenger
       Validate.IfIsOnRepository(databaseEntry.Passphrase);
     }
 
+    public static bool EntryFields(ReadWritableDatabaseEntry databaseEntry) =>
+      databaseEntry switch
+      {
+        { Platform: null } => false,
+        { Passphrase: null } => false,
+        { Passphrase.Length: < 8 or > 4096 } => false,
+        { Url: null } => false,
+        { Identity: null } => false,
+        _ => true
+      };
+
     public static void ConstantPair(ConstantPair entry, bool checkExistence = true)
     {
       // Check if required fields are provided

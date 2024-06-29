@@ -7,129 +7,120 @@ namespace Passenger
     public static void ArgumentCount(string command, int minOrActual, int max = -1)
     {
       if (minOrActual == 2)
-        Console.WriteLine($"passenger: {command}: takes no arguments");
+        Console.Error.WriteLine($"passenger: {command}: takes no arguments");
       if (max == -1)
-        Console.WriteLine($"passenger: {command}: expected exact {minOrActual} arguments");
+        Console.Error.WriteLine($"passenger: {command}: expected exact {minOrActual} arguments");
       else
-        Console.WriteLine($"passenger: {command}: expected {minOrActual}-{max} arguments");
+        Console.Error.WriteLine($"passenger: {command}: expected {minOrActual}-{max} arguments");
       AskForHelp();
       Environment.Exit(40);
     }
 
     public static void MissingCommand()
     {
-      Console.WriteLine("passenger: missing command");
+      Console.Error.WriteLine("passenger: missing command");
       Environment.Exit(40);
     }
 
     public static void UnknownCommand()
     {
-      Console.WriteLine("passenger: unknown command");
+      Console.Error.WriteLine("passenger: unknown command");
       Environment.Exit(40);
     }
 
     public static void InvalidToken()
     {
-      Console.WriteLine("passenger: invalid token");
+      Console.Error.WriteLine("passenger: invalid token");
       Environment.Exit(41);
     }
 
     public static void SecretKeyNotProvided()
     {
-      Console.WriteLine("passenger: secret key not provided");
+      Console.Error.WriteLine("passenger: secret key not provided");
       Environment.Exit(41);
     }
 
     public static void DatabaseLoadFailed()
     {
-      Console.WriteLine("passenger: failed to load or decrypt database");
+      Console.Error.WriteLine("passenger: failed to load or decrypt database");
       Environment.Exit(50);
     }
 
     public static void MissingField(string field)
     {
-      Console.WriteLine($"passenger: missing field '{field}'");
+      Console.Error.WriteLine($"passenger: missing field '{field}'");
       Environment.Exit(41);
     }
 
     public static void ConstantExists(ConstantPair constant)
     {
-      Console.WriteLine($"passenger: constant '{constant.Key}' already exists");
+      Console.Error.WriteLine($"passenger: constant '{constant.Key}' already exists");
       Environment.Exit(49);
     }
 
     public static void EntryNotFound()
     {
-      Console.WriteLine("passenger: entry not found");
+      Console.Error.WriteLine("passenger: entry not found");
       Environment.Exit(44);
     }
 
     public static void JsonParseError()
     {
-      Console.WriteLine("passenger: JSON parse error");
+      Console.Error.WriteLine("passenger: JSON parse error");
       Environment.Exit(46);
     }
 
     public static void AskForHelp()
     {
-      Console.WriteLine("passenger: try 'passenger --help' for more information");
+      Console.Error.WriteLine("passenger: try 'passenger --help' for more information");
       Environment.Exit(33);
     }
 
     public static void FoundOnRepository()
     {
-      Console.WriteLine("passenger: your password is on a brute-force repository, not saved");
+      Console.Error.WriteLine("passenger: your password is on a brute-force repository, not saved");
       Environment.Exit(43);
     }
 
     public static void PassphraseTooShort()
     {
-      Console.WriteLine("passenger: passphrase must be at least 8 characters long");
+      Console.Error.WriteLine("passenger: passphrase must be at least 8 characters long");
       Environment.Exit(46);
     }
 
     public static void PassphraseTooLong()
     {
-      Console.WriteLine("passenger: more than 4096 characters passphrases are not supported");
+      Console.Error.WriteLine("passenger: more than 4096 characters passphrases are not supported");
       Environment.Exit(46);
     }
 
     public static void BrowserTypeNotSupported()
     {
-      Console.WriteLine("passenger: browser type not supported");
+      Console.Error.WriteLine("passenger: browser type not supported");
       Environment.Exit(45);
     }
 
     public static void ExportTypeNotSupported()
     {
-      Console.WriteLine("passenger: export type not supported");
+      Console.Error.WriteLine("passenger: export type not supported");
       Environment.Exit(45);
     }
 
     public static void ImportFailed()
     {
-      Console.WriteLine("passenger: failed to import data");
+      Console.Error.WriteLine("passenger: failed to import data");
       Environment.Exit(50);
-    }
-
-    public static void ImportSkippedEntries(int count)
-    {
-      Console.WriteLine($"passenger: {(count > 1
-        ? $"{count} entries"
-        : "1 entry"
-      )} entries skipped due to short password");
-      Environment.Exit(40);
     }
 
     public static void PipedInputRequired()
     {
-      Console.WriteLine("passenger: Input not provided");
+      Console.Error.WriteLine("passenger: Input not provided");
       Environment.Exit(40);
     }
 
     public static void CSVFormatMissmatch()
     {
-      Console.WriteLine("passenger: CSV format mismatched with the specified browser");
+      Console.Error.WriteLine("passenger: CSV format mismatched with the specified browser");
       Environment.Exit(40);
     }
 
@@ -138,19 +129,19 @@ namespace Passenger
       switch (exception)
       {
         case FileNotFoundException:
-          Console.WriteLine("passenger: data file not found");
+          Console.Error.WriteLine("passenger: data file not found");
           Environment.Exit(50); break;
         case UnauthorizedAccessException:
-          Console.WriteLine("passenger: data file access denied");
+          Console.Error.WriteLine("passenger: data file access denied");
           Environment.Exit(43); break;
         case IOException:
-          Console.WriteLine("passenger: data file input/output error");
+          Console.Error.WriteLine("passenger: data file input/output error");
           Environment.Exit(50); break;
         case AuthenticationTagMismatchException:
-          Console.WriteLine("passenger: Authentication cannot be verified");
+          Console.Error.WriteLine("passenger: Authentication cannot be verified");
           Environment.Exit(41); break;
         default:
-          Console.WriteLine("passenger: unexpected error while accessing data file");
+          Console.Error.WriteLine("passenger: unexpected error while accessing data file");
           Environment.Exit(50); break;
       }
     }

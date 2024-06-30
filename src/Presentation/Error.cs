@@ -112,6 +112,24 @@ namespace Passenger
       Environment.Exit(50);
     }
 
+    public static void ImportHasBadEntries(List<DatabaseEntry> skippedEntries, List<DatabaseEntry> mappedEntries)
+    {
+      /**
+       * User can pipe the stdout to a file to import
+       * or stderr to see the skipped entries to fix them.
+       */
+      Console.Error.WriteLine(
+        "Skipped entries:\nname,url,username,password,note\n" +
+        string.Join('\n', skippedEntries.Select(Mapper.ToCSVLine)) +
+        "\nOther entries are acceptable.\n"
+      );
+      Console.WriteLine(
+        "name,url,username,password,note\n" +
+        string.Join('\n', mappedEntries.Select(Mapper.ToCSVLine))
+      );
+      Environment.Exit(40);
+    }
+
     public static void PipedInputRequired()
     {
       Console.Error.WriteLine("passenger: Input not provided");

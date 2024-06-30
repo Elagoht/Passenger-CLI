@@ -144,7 +144,7 @@ namespace Passenger
 
     public void Import()
     {
-      RoutineAuthControl("import", 2, 3);
+      RoutineAuthControl("import", 2);
       RequirePipedInput();
       // Check if browser typeis supported
       if (!Browser.SupportedBrowsers.Contains(arguments[1]))
@@ -155,24 +155,10 @@ namespace Passenger
       List<DatabaseEntry> mappedEntries = data[0];
       List<DatabaseEntry> skippedEntries = data[1];
 
-      if (skippedEntries.Count == 0)
-      {
-        Console.WriteLine(Database.Import(mappedEntries));
-        return;
-      }
-      /**
-       * User can pipe the stdout to a file to import
-       * or stderr to see the skipped entries to fix them.
-       */
-      Console.Error.WriteLine(
-        "Skipped entries:\nname,url,username,password,note\n" +
-        string.Join('\n', skippedEntries.Select(Mapper.ToCSVLine)) +
-        "\nOther entries are acceptable.\n"
-      );
-      Console.WriteLine(
-        "name,url,username,password,note\n" +
-        string.Join('\n', mappedEntries.Select(Mapper.ToCSVLine))
-      );
+      if (skippedEntries.Count > 0)
+        Error.ImportHasBadEntries(skippedEntries, mappedEntries);
+
+      Console.WriteLine(Database.Import(mappedEntries));
     }
 
     public void Export()

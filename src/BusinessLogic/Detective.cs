@@ -1,5 +1,43 @@
 namespace Passenger
 {
+  public class Detective
+  {
+    private readonly List<DatabaseEntry> entries;
+
+    public List<List<DatabaseEntry>> CommonPasswords { get; private set; }
+    public List<DatabaseEntry> SimilarWithUsername { get; private set; }
+    public List<DatabaseEntry> WeakPasswords { get; private set; }
+    public List<DatabaseEntry> OldPasswords { get; private set; }
+
+    public Detective(List<DatabaseEntry> entries)
+    {
+      this.entries = entries;
+      CommonPasswords = SetCommonPasswords();
+      SimilarWithUsername = SetSimilarWithUsername();
+    }
+
+    public List<List<DatabaseEntry>> SetCommonPasswords() => entries
+      .GroupBy(entry => entry.Passphrase)
+      .Where(group => group.Count() > 1)
+      .Select(group => group.ToList())
+      .ToList();
+
+    public List<DatabaseEntry> SetSimilarWithUsername() => entries
+      .Where(Investigator.IsPasswordSimilarToUsername)
+      .ToList();
+
+    public List<DatabaseEntry> SetWeakPasswords() => entries
+      .Where(entry => Strength.Calculate(entry.Passphrase) < 4)
+      .ToList();
+
+    public List<DatabaseEntry> SetOldPasswords() => entries
+      .Where(entry => DateTime
+        .Parse(
+          entry.PassphraseHistory.Last().Created
+        ) < DateTime.Now.AddYears(-1)
+      ).ToList();
+  }
+
   public static class Investigator
   {
     public static bool IsPasswordSimilarToUsername(DatabaseEntry entry) =>

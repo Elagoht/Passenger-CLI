@@ -31,9 +31,9 @@ namespace Passenger
         _ => throw new ArgumentException("Invalid export type")
       };
 
-    internal class ImportData
+    public class ImportData
     {
-      internal static List<DatabaseEntry>[] FromChromium(string content) =>
+      public static List<DatabaseEntry>[] FromChromium(string content) =>
         ProcessRecords(
           CSV.ReadTyped<ChromiumFields, ChromiumMap>(content),
           (record) => Mapper.CreateDatabaseEntry(
@@ -43,7 +43,7 @@ namespace Passenger
         );
 
 
-      internal static List<DatabaseEntry>[] FromFirefox(string content) =>
+      public static List<DatabaseEntry>[] FromFirefox(string content) =>
         ProcessRecords(
           CSV.ReadTyped<FirefoxFields, FirefoxMap>(content),
           (record) => Mapper.CreateDatabaseEntry(
@@ -52,7 +52,7 @@ namespace Passenger
           )
         );
 
-      internal static List<DatabaseEntry>[] FromSafari(string content) =>
+      public static List<DatabaseEntry>[] FromSafari(string content) =>
         ProcessRecords(
           CSV.ReadTyped<SafariFields, SafariMap>(content),
           (record) => Mapper.CreateDatabaseEntry(
@@ -62,7 +62,7 @@ namespace Passenger
           )
         );
 
-      internal static List<DatabaseEntry>[] ProcessRecords<T>(List<T> records, Func<T, DatabaseEntry> createEntryFunc)
+      private static List<DatabaseEntry>[] ProcessRecords<T>(List<T> records, Func<T, DatabaseEntry> createEntryFunc)
       {
         List<DatabaseEntry> mappedEntries = [];
         List<DatabaseEntry> skippedEntries = [];
@@ -77,7 +77,7 @@ namespace Passenger
         return [mappedEntries, skippedEntries];
       }
 
-      internal static string ConvertURLToPlatformName(string url)
+      private static string ConvertURLToPlatformName(string url)
       {
         string host = new Uri(url).Host.ToLower();
         string[] parts = host.Split('.');
@@ -88,13 +88,13 @@ namespace Passenger
         return host[0].ToString().ToUpper() + host[1..];
       }
 
-      internal static string NormalizeApplePlatformName(string platform) =>
+      private static string NormalizeApplePlatformName(string platform) =>
         ConvertURLToPlatformName($"https://{string.Join(
           " ",
           platform.Split(" (")[..^1]
         )}");
 
-      internal class ChromiumFields
+      private class ChromiumFields
       {
         public string Name { get; set; }
         public string Url { get; set; }
@@ -103,7 +103,7 @@ namespace Passenger
         public string Note { get; set; }
       }
 
-      internal class FirefoxFields
+      private class FirefoxFields
       {
         public string Url { get; set; }
         public string Username { get; set; }
@@ -111,7 +111,7 @@ namespace Passenger
         public string FormActionOrigin { get; set; }
       }
 
-      internal class SafariFields
+      private class SafariFields
       {
         public string Title { get; set; }
         public string Url { get; set; }
@@ -120,7 +120,7 @@ namespace Passenger
         public string Notes { get; set; }
       }
 
-      internal class ChromiumMap : ClassMap<ChromiumFields>
+      private class ChromiumMap : ClassMap<ChromiumFields>
       {
         public ChromiumMap()
         {
@@ -132,7 +132,7 @@ namespace Passenger
         }
       }
 
-      internal class FirefoxMap : ClassMap<FirefoxFields>
+      private class FirefoxMap : ClassMap<FirefoxFields>
       {
         public FirefoxMap()
         {
@@ -143,7 +143,7 @@ namespace Passenger
         }
       }
 
-      internal class SafariMap : ClassMap<SafariFields>
+      private class SafariMap : ClassMap<SafariFields>
       {
         public SafariMap()
         {
@@ -156,13 +156,13 @@ namespace Passenger
       }
     }
 
-    internal class ExportData
+    public class ExportData
     {
-      internal static string ToBare(List<ReadWritableDatabaseEntry> entries) =>
+      public static string ToBare(List<ReadWritableDatabaseEntry> entries) =>
         "name,url,username,password,note\n" +
         string.Join("", entries.Select(Mapper.ToCSVLine));
 
-      internal static string ToEncrypted(List<ReadWritableDatabaseEntry> entries) =>
+      public static string ToEncrypted(List<ReadWritableDatabaseEntry> entries) =>
         "bmFtZSx1cmwsdXNlcm5hbWUscGFzc3dvcmQsbm90ZQ==\n" +
         string.Join("\n", entries.Select(Mapper.ToEncryptedCSVLine));
     }

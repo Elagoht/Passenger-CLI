@@ -1,13 +1,20 @@
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
 namespace Passenger
 {
   public class Detective
   {
     private readonly List<DatabaseEntry> entries;
 
-    public List<List<ReadWritableDatabaseEntry>> CommonPassphrases { get; private set; }
-    public List<ReadWritableDatabaseEntry> SimilarWithUsername { get; private set; }
-    public List<ReadWritableDatabaseEntry> WeakPassphrases { get; private set; }
-    public List<ReadWritableDatabaseEntry> OldPassphrases { get; private set; }
+    [JsonPropertyName("commonPassphrases"), Required]
+    public List<List<ListableDatabaseEntry>> CommonPassphrases { get; private set; }
+    [JsonPropertyName("similarWithUsername"), Required]
+    public List<ListableDatabaseEntry> SimilarWithUsername { get; private set; }
+    [JsonPropertyName("weakPassphrases"), Required]
+    public List<ListableDatabaseEntry> WeakPassphrases { get; private set; }
+    [JsonPropertyName("oldPassphrases"), Required]
+    public List<ListableDatabaseEntry> OldPassphrases { get; private set; }
 
     public Detective(List<DatabaseEntry> entries)
     {
@@ -18,30 +25,30 @@ namespace Passenger
       OldPassphrases = SetOldPassphrases();
     }
 
-    private List<List<ReadWritableDatabaseEntry>> SetCommonPassphrases() => entries
+    private List<List<ListableDatabaseEntry>> SetCommonPassphrases() => entries
       .GroupBy(entry => entry.Passphrase)
       .Where(group => group.Count() > 1)
       .Select(group => group.Select(
-          Mapper.ToReadWritable
+          Mapper.ToListable
         ).ToList()
       ).ToList();
 
-    private List<ReadWritableDatabaseEntry> SetSimilarWithUsername() => entries
+    private List<ListableDatabaseEntry> SetSimilarWithUsername() => entries
       .Where(Investigator.IsPassphraseSimilarToUsername)
-      .Select(Mapper.ToReadWritable)
+      .Select(Mapper.ToListable)
       .ToList();
 
-    private List<ReadWritableDatabaseEntry> SetWeakPassphrases() => entries
+    private List<ListableDatabaseEntry> SetWeakPassphrases() => entries
       .Where(entry => Strength.Calculate(entry.Passphrase) < 4)
-      .Select(Mapper.ToReadWritable)
+      .Select(Mapper.ToListable)
       .ToList();
 
-    private List<ReadWritableDatabaseEntry> SetOldPassphrases() => entries
+    private List<ListableDatabaseEntry> SetOldPassphrases() => entries
       .Where(entry => DateTime
         .Parse(
           entry.PassphraseHistory.Last().Created
         ) < DateTime.Now.AddYears(-1)
-      ).Select(Mapper.ToReadWritable
+      ).Select(Mapper.ToListable
       ).ToList();
   }
 

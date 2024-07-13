@@ -4,10 +4,10 @@ namespace Passenger
   {
     private readonly List<DatabaseEntry> entries;
 
-    public List<List<DatabaseEntry>> CommonPassphrases { get; private set; }
-    public List<DatabaseEntry> SimilarWithUsername { get; private set; }
-    public List<DatabaseEntry> WeakPassphrases { get; private set; }
-    public List<DatabaseEntry> OldPassphrases { get; private set; }
+    public List<List<ReadWritableDatabaseEntry>> CommonPassphrases { get; private set; }
+    public List<ReadWritableDatabaseEntry> SimilarWithUsername { get; private set; }
+    public List<ReadWritableDatabaseEntry> WeakPassphrases { get; private set; }
+    public List<ReadWritableDatabaseEntry> OldPassphrases { get; private set; }
 
     public Detective(List<DatabaseEntry> entries)
     {
@@ -18,25 +18,30 @@ namespace Passenger
       OldPassphrases = SetOldPassphrases();
     }
 
-    private List<List<DatabaseEntry>> SetCommonPassphrases() => entries
+    private List<List<ReadWritableDatabaseEntry>> SetCommonPassphrases() => entries
       .GroupBy(entry => entry.Passphrase)
       .Where(group => group.Count() > 1)
-      .Select(group => group.ToList())
-      .ToList();
+      .Select(group => group.Select(
+          Mapper.ToReadWritable
+        ).ToList()
+      ).ToList();
 
-    private List<DatabaseEntry> SetSimilarWithUsername() => entries
+    private List<ReadWritableDatabaseEntry> SetSimilarWithUsername() => entries
       .Where(Investigator.IsPassphrasesimilarToUsername)
+      .Select(Mapper.ToReadWritable)
       .ToList();
 
-    private List<DatabaseEntry> SetWeakPassphrases() => entries
+    private List<ReadWritableDatabaseEntry> SetWeakPassphrases() => entries
       .Where(entry => Strength.Calculate(entry.Passphrase) < 4)
+      .Select(Mapper.ToReadWritable)
       .ToList();
 
-    private List<DatabaseEntry> SetOldPassphrases() => entries
+    private List<ReadWritableDatabaseEntry> SetOldPassphrases() => entries
       .Where(entry => DateTime
         .Parse(
           entry.PassphraseHistory.Last().Created
         ) < DateTime.Now.AddYears(-1)
+      ).Select(Mapper.ToReadWritable
       ).ToList();
   }
 

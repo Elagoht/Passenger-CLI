@@ -57,6 +57,10 @@ We welcome contributions! Please submit a pull request or create an issue to dis
 
 This project is licensed under the GNU General Public License v3.0. For more details, see the [LICENSE](LICENSE) file in the project root.
 
+## Documentation
+
+Document files are located in [docs/](docs) directory.
+
 ---
 
 Feel free to reach out if you have any questions or need further assistance. Thank you for using Passenger!

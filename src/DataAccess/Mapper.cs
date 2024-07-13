@@ -1,27 +1,10 @@
+using System.Buffers.Text;
+using System.Text;
+
 namespace Passenger
 {
   public static class Mapper
   {
-    public static DatabaseEntry NewlyCreated(ReadWritableDatabaseEntry entry) => new()
-    {
-      Id = entry.Id,
-      Platform = entry.Platform,
-      Url = entry.Url,
-      Identity = entry.Identity,
-      Created = entry.Created,
-      Updated = entry.Updated,
-      TotalAccesses = entry.TotalAccesses,
-      Passphrase = entry.Passphrase,
-      PassphraseHistory = [
-        new() {
-          Created = entry.Created,
-          Length= entry.Passphrase.Length,
-          Strength = Strength.Calculate(entry.Passphrase)
-        }
-      ],
-      Notes = entry.Notes
-    };
-
     public static ReadWritableDatabaseEntry ToReadWritable(DatabaseEntry entry) => new()
     {
       Id = entry.Id,
@@ -64,5 +47,32 @@ namespace Passenger
       Database.AllConstants.Find((pair) =>
         $"_${pair.Key}" == key
       )?.Value ?? key;
+
+    public static string ToCSVLine(ReadWritableDatabaseEntry entry) =>
+      $"{entry.Platform},{entry.Url},{entry.Identity},{entry.Passphrase},{entry.Notes}";
+
+    public static string ToEncryptedCSVLine(ReadWritableDatabaseEntry entry) =>
+      Convert.ToBase64String(Encoding.UTF8.GetBytes(
+        ToCSVLine(entry)
+      ));
+
+    public static DatabaseEntry CreateDatabaseEntry(string platform, string identity, string url, string passphrase, string notes = null) =>
+      new()
+      {
+        Id = Guid.NewGuid().ToString(),
+        Platform = platform,
+        Identity = identity,
+        Url = url,
+        Notes = notes,
+        Passphrase = passphrase,
+        PassphraseHistory = [new() {
+          Length = passphrase.Length,
+          Strength = Strength.Calculate(passphrase),
+          Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+        }],
+        Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+        Updated = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+        TotalAccesses = 0,
+      };
   }
 }

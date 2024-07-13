@@ -138,6 +138,13 @@ namespace Passenger
       Console.WriteLine(JsonSerializer.Serialize(dashboardData));
     }
 
+    public void Detect()
+    {
+      RoutineAuthControl("detect", 1);
+      Detective detective = new(Database.AllEntries);
+      Console.WriteLine(JsonSerializer.Serialize(detective));
+    }
+
     /*
      * Data transfer
      */
@@ -311,6 +318,11 @@ COMMANDS
             Show statistics of the database.
             passenger stats [jwt]
 
+      detect -d
+            Detect issues about the security of passphrases, requires a JWT
+            token.
+            passenger detect [jwt]
+
       import -i
             Import a CSV file from a browser, requires a JWT token.
             Browser can be chromium, firefox, or safari.
@@ -408,6 +420,7 @@ Commands:
   update     -u [jwt] [uuid] [json]     : update an entry by its uuid
   delete     -d [jwt] [uuid]            : delete an entry by its index
   stats      -s [jwt]                   : show statistics of the database
+  detect     -d [jwt]                   : detect issues about security of passphrases
   import     -i [jwt] [browser]         : import `chromium`, `firefox` or `safari` csv
   export     -e [jwt] [method]          : export to `bare` or `encrypted` csv
   declare    -D [jwt] [key] [value]     : declare a new key-value pair

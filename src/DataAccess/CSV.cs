@@ -4,7 +4,7 @@ using CsvHelper.Configuration;
 
 namespace Passenger
 {
-  public class CSV
+  public static class CSV
   {
     public static List<Type> ReadTyped<Type, TMap>(string csvContent)
       where TMap : ClassMap<Type>

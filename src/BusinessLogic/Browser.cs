@@ -156,7 +156,7 @@ namespace Passenger
       }
     }
 
-    public class ExportData
+    public static class ExportData
     {
       public static string ToBare(List<ReadWritableDatabaseEntry> entries) =>
         "name,url,username,password,note\n" +

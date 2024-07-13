@@ -27,7 +27,7 @@ namespace Passenger
       ).ToList();
 
     private List<ReadWritableDatabaseEntry> SetSimilarWithUsername() => entries
-      .Where(Investigator.IsPassphrasesimilarToUsername)
+      .Where(Investigator.IsPassphraseSimilarToUsername)
       .Select(Mapper.ToReadWritable)
       .ToList();
 
@@ -47,10 +47,10 @@ namespace Passenger
 
   public static class Investigator
   {
-    public static bool IsPassphrasesimilarToUsername(DatabaseEntry entry) =>
+    public static bool IsPassphraseSimilarToUsername(DatabaseEntry entry) =>
       ComputeLevenshteinDistance(
         entry.Identity.ToLower(),
-      entry.Passphrase.ToLower()
+        entry.Passphrase.ToLower()
       ) <= 3; // Threshold
 
     private static int ComputeLevenshteinDistance(string source, string target)

@@ -4,33 +4,35 @@ namespace Passenger
   {
     private readonly List<DatabaseEntry> entries;
 
-    public List<List<DatabaseEntry>> CommonPasswords { get; private set; }
+    public List<List<DatabaseEntry>> CommonPassphrases { get; private set; }
     public List<DatabaseEntry> SimilarWithUsername { get; private set; }
-    public List<DatabaseEntry> WeakPasswords { get; private set; }
-    public List<DatabaseEntry> OldPasswords { get; private set; }
+    public List<DatabaseEntry> WeakPassphrases { get; private set; }
+    public List<DatabaseEntry> OldPassphrases { get; private set; }
 
     public Detective(List<DatabaseEntry> entries)
     {
       this.entries = entries;
-      CommonPasswords = SetCommonPasswords();
+      CommonPassphrases = SetCommonPassphrases();
       SimilarWithUsername = SetSimilarWithUsername();
+      WeakPassphrases = SetWeakPassphrases();
+      OldPassphrases = SetOldPassphrases();
     }
 
-    public List<List<DatabaseEntry>> SetCommonPasswords() => entries
+    private List<List<DatabaseEntry>> SetCommonPassphrases() => entries
       .GroupBy(entry => entry.Passphrase)
       .Where(group => group.Count() > 1)
       .Select(group => group.ToList())
       .ToList();
 
-    public List<DatabaseEntry> SetSimilarWithUsername() => entries
-      .Where(Investigator.IsPasswordSimilarToUsername)
+    private List<DatabaseEntry> SetSimilarWithUsername() => entries
+      .Where(Investigator.IsPassphrasesimilarToUsername)
       .ToList();
 
-    public List<DatabaseEntry> SetWeakPasswords() => entries
+    private List<DatabaseEntry> SetWeakPassphrases() => entries
       .Where(entry => Strength.Calculate(entry.Passphrase) < 4)
       .ToList();
 
-    public List<DatabaseEntry> SetOldPasswords() => entries
+    private List<DatabaseEntry> SetOldPassphrases() => entries
       .Where(entry => DateTime
         .Parse(
           entry.PassphraseHistory.Last().Created
@@ -40,7 +42,7 @@ namespace Passenger
 
   public static class Investigator
   {
-    public static bool IsPasswordSimilarToUsername(DatabaseEntry entry) =>
+    public static bool IsPassphrasesimilarToUsername(DatabaseEntry entry) =>
       ComputeLevenshteinDistance(
         entry.Identity.ToLower(),
       entry.Passphrase.ToLower()

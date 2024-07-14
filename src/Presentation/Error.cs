@@ -55,7 +55,7 @@ namespace Passenger
     public static void MissingField(string field)
     {
       Console.Error.WriteLine($"passenger: missing field '{field}'");
-      Environment.Exit(41);
+      Environment.Exit(40);
     }
 
     public static void ConstantExists(ConstantPair constant)

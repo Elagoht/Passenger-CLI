@@ -43,8 +43,8 @@ namespace Passenger
 
     public void Reset()
     {
-      RoutineAuthControl("reset", 2);
-      Database.ResetPassphrase(arguments[1]);
+      RoutineAuthControl("reset", 3);
+      Database.ResetPassphrase(arguments[1], arguments[2]);
     }
 
     /*
@@ -286,7 +286,7 @@ COMMANDS
       reset -R
             Reset the passphrase of the Passenger client using a JWT token
             and a new passphrase.
-            passenger reset [jwt] [new]
+            passenger reset [jwt] [old] [new]
 
       fetchAll -a
             List all entries without displaying their passphrases, requires
@@ -412,7 +412,7 @@ Usage:
 Commands:
   login      -l [username] [passphrase] : generate a JWT token to use other commands
   register   -r [username] [passphrase] : register a passphrase to the passenger client
-  reset      -R [jwt] [new]             : reset the passphrase of the passenger client
+  reset      -R [jwt] [old] [new]       : reset the passphrase of the passenger client
   fetchAll   -a [jwt]                   : list all entries without their passphrases
   query      -q [jwt] [keyword]         : list search results without their passphrases
   fetch      -f [jwt] [uuid]            : retrieve an entry by its uuid with its passphrase

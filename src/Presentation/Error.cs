@@ -34,6 +34,12 @@ namespace Passenger
       Environment.Exit(41);
     }
 
+    public static void InvalidPassphrase()
+    {
+      Console.Error.WriteLine("passenger: master passphrase did not match");
+      Environment.Exit(40);
+    }
+
     public static void SecretKeyNotProvided()
     {
       Console.Error.WriteLine("passenger: secret key not provided");

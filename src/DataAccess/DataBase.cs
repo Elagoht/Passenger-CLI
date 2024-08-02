@@ -21,7 +21,7 @@ namespace Passenger
      * Database file
      */
 
-    private static readonly string databaseFile = "./passenger.bus";
+    private static readonly string databaseFile = OperatingSystem.StoragePath;
     private static readonly DatabaseModel database;
 
     public static void SaveToFile()

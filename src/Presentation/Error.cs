@@ -58,12 +58,6 @@ namespace Passenger
       Environment.Exit(40);
     }
 
-    public static void ConstantExists(ConstantPair constant)
-    {
-      Console.Error.WriteLine($"passenger: constant '{constant.Key}' already exists");
-      Environment.Exit(49);
-    }
-
     public static void EntryNotFound()
     {
       Console.Error.WriteLine("passenger: entry not found");

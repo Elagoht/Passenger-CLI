@@ -21,7 +21,7 @@ namespace Passenger
     {
       Id = entry.Id,
       Platform = entry.Platform,
-      Identity = ResolveConstant(entry.Identity),
+      Identity = entry.Identity,
       Url = entry.Url,
       Created = entry.Created,
       Updated = entry.Updated,
@@ -42,11 +42,6 @@ namespace Passenger
       Id = entry.Id,
       Url = entry.Url
     };
-
-    public static string ResolveConstant(string key) =>
-      Database.AllConstants.Find((pair) =>
-        $"_${pair.Key}" == key
-      )?.Value ?? key;
 
     public static string ToCSVLine(ReadWritableDatabaseEntry entry) =>
       $"{entry.Platform},{entry.Url},{entry.Identity},{entry.Passphrase},{entry.Notes}";

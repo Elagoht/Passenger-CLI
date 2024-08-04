@@ -6,7 +6,7 @@ namespace Passenger
   {
     public static void ArgumentCount(string command, int minOrActual, int max = -1)
     {
-      if (minOrActual == 2)
+      if (minOrActual == 1)
         Console.Error.WriteLine($"passenger: {command}: takes no arguments");
       if (max == -1)
         Console.Error.WriteLine($"passenger: {command}: expected exact {minOrActual} arguments");

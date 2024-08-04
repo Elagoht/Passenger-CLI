@@ -7,14 +7,19 @@ namespace Passenger
     private readonly Authorization authorization = new(EnDeCoder.JSWSecret);
     private readonly string[] arguments = args.Skip(1).ToArray();
     private readonly string piped = piped;
+    private Database database;
 
     private void RoutineAuthControl(string verbName, int minOrActual, int max = -1)
     {
+      string token = Environment.GetEnvironmentVariable("JWT");
+
       if (arguments.Length < minOrActual || (max != -1 && arguments.Length > max))
         Error.ArgumentCount(verbName, minOrActual, max);
-      if (!authorization.ValidateToken(
-        Environment.GetEnvironmentVariable("JWT")
-      )) Error.InvalidToken();
+      if (!authorization.ValidateToken(token))
+        Error.InvalidToken();
+
+      // Initialize database
+      database = new Database(Authorization.GetUserName(token));
     }
 
     private void RequirePipedInput()
@@ -36,16 +41,16 @@ namespace Passenger
     public void Register()
     {
       if (arguments.Length != 2) Error.ArgumentCount("register", 2);
-      if (Database.IsRegistered())
+      if (database.IsRegistered())
         Console.WriteLine("passenger: already registered");
       else
-        Database.Register(arguments[0], arguments[1]);
+        database.Register(arguments[0], arguments[1]);
     }
 
     public void Reset()
     {
       RoutineAuthControl("reset", 2);
-      Database.ResetPassphrase(arguments[0], arguments[1]);
+      database.ResetPassphrase(arguments[0], arguments[1]);
     }
 
     /*
@@ -56,7 +61,7 @@ namespace Passenger
     {
       RoutineAuthControl("create", 1);
       Console.WriteLine(JsonSerializer.Serialize(
-        Database.Create(Validate.JsonAsDatabaseEntry(arguments[0]))
+        database.Create(Validate.JsonAsDatabaseEntry(arguments[0]))
       ));
     }
 
@@ -64,7 +69,7 @@ namespace Passenger
     {
       RoutineAuthControl("fetchAll", 0);
       Console.WriteLine(JsonSerializer.Serialize(
-        Database.FetchAll()
+        database.FetchAll()
       ));
     }
 
@@ -78,10 +83,10 @@ namespace Passenger
        * the stats of the passphrase, not the
        * passphrase itself.
        */
-      DatabaseEntry entry = Database.Fetch(arguments[0]);
+      DatabaseEntry entry = database.Fetch(arguments[0]);
       if (entry == null) Error.EntryNotFound();
       entry.TotalAccesses++;
-      Database.Update(entry.Id, entry, false);
+      database.Update(entry.Id, entry, false);
       Console.WriteLine(JsonSerializer.Serialize(entry));
     }
 
@@ -90,7 +95,7 @@ namespace Passenger
       RoutineAuthControl("query", 1);
       Console.WriteLine(
         JsonSerializer.Serialize(
-          Database.Query(arguments[0])
+          database.Query(arguments[0])
         )
       );
     }
@@ -101,14 +106,14 @@ namespace Passenger
       ReadWritableDatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[1]);
       Validate.Entry(entry);
       Console.WriteLine(JsonSerializer.Serialize(
-        Database.Update(arguments[0], entry)
+        database.Update(arguments[0], entry)
       ));
     }
 
     public void Delete()
     {
       RoutineAuthControl("delete", 1);
-      Database.Delete(arguments[0]);
+      database.Delete(arguments[0]);
     }
 
     /*
@@ -118,7 +123,7 @@ namespace Passenger
     public void Statistics()
     {
       RoutineAuthControl("stats", 0);
-      Statistics statistics = new(Database.AllReadWritableEntries);
+      Statistics statistics = new(database.AllReadWritableEntries);
       DashboardData dashboardData = new()
       {
         TotalCount = statistics.TotalCount,
@@ -142,7 +147,7 @@ namespace Passenger
     public void Detect()
     {
       RoutineAuthControl("detect", 0);
-      Detective detective = new(Database.AllEntries);
+      Detective detective = new(database.AllEntries);
       Console.WriteLine(JsonSerializer.Serialize(detective));
     }
 
@@ -166,7 +171,7 @@ namespace Passenger
       if (skippedEntries.Count > 0)
         Error.ImportHasBadEntries(skippedEntries, mappedEntries);
 
-      Console.WriteLine(Database.Import(mappedEntries));
+      Console.WriteLine(database.Import(mappedEntries));
     }
 
     public void Export()
@@ -175,7 +180,7 @@ namespace Passenger
       if (!Browser.exportTypes.Contains(arguments[0]))
         Error.ExportTypeNotSupported();
       Console.WriteLine(Browser.Export(
-        arguments[0], Database.AllReadWritableEntries
+        arguments[0], database.AllReadWritableEntries
       ));
     }
 
@@ -192,7 +197,7 @@ namespace Passenger
         Value = arguments[1]
       };
       Validate.ConstantPair(constantPair);
-      Database.DeclareConstant(constantPair);
+      database.DeclareConstant(constantPair);
     }
 
     public void Modify()
@@ -203,13 +208,13 @@ namespace Passenger
         Key = arguments[1],
         Value = arguments[2]
       };
-      Database.ModifyConstant(arguments[0], newPair);
+      database.ModifyConstant(arguments[0], newPair);
     }
 
     public void Remember()
     {
       RoutineAuthControl("remember", 1);
-      ConstantPair constantPair = Database.FetchConstant(arguments[0]);
+      ConstantPair constantPair = database.FetchConstant(arguments[0]);
       if (constantPair == null) Error.EntryNotFound();
       Console.WriteLine(JsonSerializer.Serialize(constantPair));
     }
@@ -217,14 +222,14 @@ namespace Passenger
     public void Forget()
     {
       RoutineAuthControl("forget", 1);
-      Database.ForgetConstant(arguments[0]);
+      database.ForgetConstant(arguments[0]);
     }
 
     public void Constants()
     {
       RoutineAuthControl("constants", 0);
       Console.WriteLine(
-        JsonSerializer.Serialize(Database.AllConstants)
+        JsonSerializer.Serialize(database.AllConstants)
       );
     }
 

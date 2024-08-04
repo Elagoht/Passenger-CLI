@@ -12,8 +12,9 @@ namespace Passenger
     {
       if (arguments.Length < minOrActual || (max != -1 && arguments.Length > max))
         Error.ArgumentCount(verbName, minOrActual, max);
-      if (!authorization.ValidateToken(arguments[0]))
-        Error.InvalidToken();
+      if (!authorization.ValidateToken(
+        Environment.GetEnvironmentVariable("JWT")
+      )) Error.InvalidToken();
     }
 
     private void RequirePipedInput()
@@ -43,8 +44,8 @@ namespace Passenger
 
     public void Reset()
     {
-      RoutineAuthControl("reset", 3);
-      Database.ResetPassphrase(arguments[1], arguments[2]);
+      RoutineAuthControl("reset", 2);
+      Database.ResetPassphrase(arguments[0], arguments[1]);
     }
 
     /*
@@ -53,15 +54,15 @@ namespace Passenger
 
     public void Create()
     {
-      RoutineAuthControl("create", 2);
+      RoutineAuthControl("create", 1);
       Console.WriteLine(JsonSerializer.Serialize(
-        Database.Create(Validate.JsonAsDatabaseEntry(arguments[1]))
+        Database.Create(Validate.JsonAsDatabaseEntry(arguments[0]))
       ));
     }
 
     public void FetchAll()
     {
-      RoutineAuthControl("fetchAll", 1);
+      RoutineAuthControl("fetchAll", 0);
       Console.WriteLine(JsonSerializer.Serialize(
         Database.FetchAll()
       ));
@@ -69,7 +70,7 @@ namespace Passenger
 
     public void Fetch()
     {
-      RoutineAuthControl("fetch", 2);
+      RoutineAuthControl("fetch", 1);
       /**
        * Fetch can read passphrase history as well.
        * Don't worry, it's not a security issue.
@@ -77,7 +78,7 @@ namespace Passenger
        * the stats of the passphrase, not the
        * passphrase itself.
        */
-      DatabaseEntry entry = Database.Fetch(arguments[1]);
+      DatabaseEntry entry = Database.Fetch(arguments[0]);
       if (entry == null) Error.EntryNotFound();
       entry.TotalAccesses++;
       Database.Update(entry.Id, entry, false);
@@ -86,28 +87,28 @@ namespace Passenger
 
     public void Query()
     {
-      RoutineAuthControl("query", 2);
+      RoutineAuthControl("query", 1);
       Console.WriteLine(
         JsonSerializer.Serialize(
-          Database.Query(arguments[1])
+          Database.Query(arguments[0])
         )
       );
     }
 
     public void Update()
     {
-      RoutineAuthControl("update", 3);
-      ReadWritableDatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[2]);
+      RoutineAuthControl("update", 2);
+      ReadWritableDatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[1]);
       Validate.Entry(entry);
       Console.WriteLine(JsonSerializer.Serialize(
-        Database.Update(arguments[1], entry)
+        Database.Update(arguments[0], entry)
       ));
     }
 
     public void Delete()
     {
-      RoutineAuthControl("delete", 2);
-      Database.Delete(arguments[1]);
+      RoutineAuthControl("delete", 1);
+      Database.Delete(arguments[0]);
     }
 
     /*
@@ -116,7 +117,7 @@ namespace Passenger
 
     public void Statistics()
     {
-      RoutineAuthControl("stats", 1);
+      RoutineAuthControl("stats", 0);
       Statistics statistics = new(Database.AllReadWritableEntries);
       DashboardData dashboardData = new()
       {
@@ -140,7 +141,7 @@ namespace Passenger
 
     public void Detect()
     {
-      RoutineAuthControl("detect", 1);
+      RoutineAuthControl("detect", 0);
       Detective detective = new(Database.AllEntries);
       Console.WriteLine(JsonSerializer.Serialize(detective));
     }
@@ -151,14 +152,14 @@ namespace Passenger
 
     public void Import()
     {
-      RoutineAuthControl("import", 2);
+      RoutineAuthControl("import", 1);
       RequirePipedInput();
       // Check if browser typeis supported
-      if (!Browser.SupportedBrowsers.Contains(arguments[1]))
+      if (!Browser.SupportedBrowsers.Contains(arguments[0]))
         Error.BrowserTypeNotSupported();
 
       // Get imported and skipped entries
-      List<DatabaseEntry>[] data = Browser.Import(arguments[1], piped);
+      List<DatabaseEntry>[] data = Browser.Import(arguments[0], piped);
       List<DatabaseEntry> mappedEntries = data[0];
       List<DatabaseEntry> skippedEntries = data[1];
 
@@ -170,11 +171,11 @@ namespace Passenger
 
     public void Export()
     {
-      RoutineAuthControl("export", 2);
-      if (!Browser.exportTypes.Contains(arguments[1]))
+      RoutineAuthControl("export", 1);
+      if (!Browser.exportTypes.Contains(arguments[0]))
         Error.ExportTypeNotSupported();
       Console.WriteLine(Browser.Export(
-        arguments[1], Database.AllReadWritableEntries
+        arguments[0], Database.AllReadWritableEntries
       ));
     }
 
@@ -184,11 +185,11 @@ namespace Passenger
 
     public void Declare()
     {
-      RoutineAuthControl("declare", 3);
+      RoutineAuthControl("declare", 2);
       ConstantPair constantPair = new()
       {
-        Key = arguments[1],
-        Value = arguments[2]
+        Key = arguments[0],
+        Value = arguments[1]
       };
       Validate.ConstantPair(constantPair);
       Database.DeclareConstant(constantPair);
@@ -196,32 +197,32 @@ namespace Passenger
 
     public void Modify()
     {
-      RoutineAuthControl("modify", 4);
+      RoutineAuthControl("modify", 3);
       ConstantPair newPair = new()
       {
-        Key = arguments[2],
-        Value = arguments[3]
+        Key = arguments[1],
+        Value = arguments[2]
       };
-      Database.ModifyConstant(arguments[1], newPair);
+      Database.ModifyConstant(arguments[0], newPair);
     }
 
     public void Remember()
     {
-      RoutineAuthControl("remember", 2);
-      ConstantPair constantPair = Database.FetchConstant(arguments[1]);
+      RoutineAuthControl("remember", 1);
+      ConstantPair constantPair = Database.FetchConstant(arguments[0]);
       if (constantPair == null) Error.EntryNotFound();
       Console.WriteLine(JsonSerializer.Serialize(constantPair));
     }
 
     public void Forget()
     {
-      RoutineAuthControl("forget", 2);
-      Database.ForgetConstant(arguments[1]);
+      RoutineAuthControl("forget", 1);
+      Database.ForgetConstant(arguments[0]);
     }
 
     public void Constants()
     {
-      RoutineAuthControl("constants", 1);
+      RoutineAuthControl("constants", 0);
       Console.WriteLine(
         JsonSerializer.Serialize(Database.AllConstants)
       );
@@ -275,7 +276,7 @@ DESCRIPTION
 
 COMMANDS
       login -l
-            Generate a JWT token to use other commands. Requires a
+            Generate a JWT to use other commands. Requires a
             passphrase.
             passenger login -l [username] [passphrase]
 
@@ -284,47 +285,47 @@ COMMANDS
             passenger register [username] [passphrase]
 
       reset -R
-            Reset the passphrase of the Passenger client using a JWT token
+            Reset the passphrase of the Passenger client using a JWT
             and a new passphrase.
-            passenger reset [jwt] [old] [new]
+            JWT=[jwt] passenger reset [old] [new]
 
       fetchAll -a
             List all entries without displaying their passphrases, requires
-            a JWT token.
-            passenger fetchAll [jwt]
+            a JWT.
+            JWT=[jwt] passenger fetchAll
 
       query -q
-            Search for a keyword in all entries, requires a JWT token.
-            passenger query [jwt] [keyword]
+            Search for a keyword in all entries, requires a JWT.
+            JWT=[jwt] passenger query [keyword]
 
       fetch -f
-            Retrieve an entry by its UUID, requires a JWT token.
-            passenger fetch [jwt] [uuid]
+            Retrieve an entry by its UUID, requires a JWT.
+            JWT=[jwt] passenger fetch [uuid]
 
       create -c
-            Store an entry with the given json, requires a JWT token.
-            passenger create [jwt] [json]
+            Store an entry with the given json, requires a JWT.
+            JWT=[jwt] passenger create [json]
 
       update -u
-            Update an entry by its UUID, requires a JWT token and JSON
+            Update an entry by its UUID, requires a JWT and JSON
             formatted json.
-            passenger update [jwt] [uuid] [json]
+            JWT=[jwt] passenger update [uuid] [json]
 
       delete -d
-            Delete an entry by its UUID, requires a JWT token.
-            passenger delete [jwt] [uuid]
+            Delete an entry by its UUID, requires a JWT.
+            JWT=[jwt] passenger delete [uuid]
 
       stats -s
             Show statistics of the database.
-            passenger stats [jwt]
+            JWT=[jwt] passenger stats
 
       detect -d
             Detect issues about the security of passphrases, requires a JWT
             token.
-            passenger detect [jwt]
+            JWT=[jwt] passenger detect
 
       import -i
-            Import a CSV file from a browser, requires a JWT token.
+            Import a CSV file from a browser, requires a JWT.
             Browser can be chromium, firefox, or safari.
             You can export your passwords as a CSV file from your browser.
             Accepts the CSV content as piped input to support custom clients.
@@ -336,35 +337,35 @@ COMMANDS
 
             Accaptable entries can be piped to a file to import from it.
 
-            cat passwords.csv | passenger import [jwt] [browser]
+            cat passwords.csv | JWT=[jwt] passenger import [browser]
 
       export -e
-            Export the database to a CSV file, requires a JWT token.
+            Export the database to a CSV file, requires a JWT.
             Method can be bare or encrypted. Base64 encryption will be used.
             Writes to stdout, can be redirected to a file.
-            passenger export [jwt] [method]
+            JWT=[jwt] passenger export [method]
 
       declare -D
-            Declare a new key-value pair, requires a JWT token.
+            Declare a new key-value pair, requires a JWT.
             Theses pairs are constant values that can be replaced
             on response.
-            passenger declare [jwt] [key] [value]
+            JWT=[jwt] passenger declare [key] [value]
 
       modify -M
-            Modify a key-value pair, requires a JWT token.
-            passenger modify [jwt] [key] [value]
+            Modify a key-value pair, requires a JWT.
+            JWT=[jwt] passenger modify [key] [value]
 
       remember -R
-            Fetch a key-value pair, requires a JWT token.
-            passenger remember [jwt] [key]
+            Fetch a key-value pair, requires a JWT.
+            JWT=[jwt] passenger remember [key]
 
       forget -F
-            Forget a key-value pair, requires a JWT token.
-            passenger forget [jwt] [key]
+            Forget a key-value pair, requires a JWT.
+            JWT=[jwt] passenger forget [key]
 
       constants -C
-            List all declared constants, requires a JWT token.
-            passenger constants [jwt]
+            List all declared constants, requires a JWT.
+            JWT=[jwt] passenger constants
 
       generate -g
             Generate a passphrase with the given length.
@@ -408,26 +409,28 @@ SEE ALSO
 
 Usage:
   passenger [command] [*args]
+  SECRET_KEY=[key] passenger [command] [*args]
+  SECRET_KEY=[key] JWT=[jwt] passenger [command] [*args]
 
 Commands:
-  login      -l [username] [passphrase] : generate a JWT token to use other commands
+  login      -l [username] [passphrase] : generate a JWT to use other commands
   register   -r [username] [passphrase] : register a passphrase to the passenger client
-  reset      -R [jwt] [old] [new]       : reset the passphrase of the passenger client
-  fetchAll   -a [jwt]                   : list all entries without their passphrases
-  query      -q [jwt] [keyword]         : list search results without their passphrases
-  fetch      -f [jwt] [uuid]            : retrieve an entry by its uuid with its passphrase
-  create     -c [jwt] [json]            : store an entry with the given json
-  update     -u [jwt] [uuid] [json]     : update an entry by its uuid
-  delete     -d [jwt] [uuid]            : delete an entry by its index
-  stats      -s [jwt]                   : show statistics of the database
-  detect     -d [jwt]                   : detect issues about security of passphrases
-  import     -i [jwt] [browser]         : import `chromium`, `firefox` or `safari` csv
-  export     -e [jwt] [method]          : export to `bare` or `encrypted` csv
-  declare    -D [jwt] [key] [value]     : declare a new key-value pair
-  modify     -M [jwt] [key] [value]     : modify a key-value pair
-  remember   -R [jwt] [key] [value]     : fetch a key-value pair
-  forget     -F [jwt] [key]             : delete a key-value pair
-  constants  -C [jwt]                   : list all declared constants
+  reset      -R [old] [new]             : reset the passphrase of the passenger client
+  fetchAll   -a                         : list all entries without their passphrases
+  query      -q [keyword]               : list search results without their passphrases
+  fetch      -f [uuid]                  : retrieve an entry by its uuid with its passphrase
+  create     -c [json]                  : store an entry with the given json
+  update     -u [uuid] [json]           : update an entry by its uuid
+  delete     -d [uuid]                  : delete an entry by its index
+  stats      -s                         : show statistics of the database
+  detect     -d                         : detect issues about security of passphrases
+  import     -i [browser]               : import `chromium`, `firefox` or `safari` csv
+  export     -e [method]                : export to `bare` or `encrypted` csv
+  declare    -D [key] [value]           : declare a new key-value pair
+  modify     -M [key] [value]           : modify a key-value pair
+  remember   -R [key] [value]           : fetch a key-value pair
+  forget     -F [key]                   : delete a key-value pair
+  constants  -C                         : list all declared constants
   generate   -g [length]                : generate a passphrase with the given length
   manipulate -m [passphrase]            : manipulate a passphrase
   version    -v --version               : show the version and exit

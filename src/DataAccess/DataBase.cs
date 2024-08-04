@@ -2,12 +2,19 @@ using System.Text.Json;
 
 namespace Passenger
 {
-  public static class Database
+  public class Database
   {
-    static Database()
+    private readonly string databaseFile;
+    private readonly DatabaseModel database;
+
+    public Database(string username)
     {
       try
       {
+        databaseFile = Path.Combine(
+          OperatingSystem.StoragePath,
+          $"{username}.bus"
+        );
         string data = File.Exists(databaseFile)
           ? FileSystem.Read(databaseFile)
           : "{}";
@@ -21,10 +28,7 @@ namespace Passenger
      * Database file
      */
 
-    private static readonly string databaseFile = OperatingSystem.StoragePath;
-    private static readonly DatabaseModel database;
-
-    public static void SaveToFile()
+    public void SaveToFile()
     {
       try
       {
@@ -42,17 +46,17 @@ namespace Passenger
      * Authorization methods
      */
 
-    public static Credentials GetCredentials() => new()
+    public Credentials GetCredentials() => new()
     {
       Username = database.Username,
       Passphrase = database.Passphrase
     };
 
-    public static bool IsRegistered() =>
+    public bool IsRegistered() =>
       !string.IsNullOrEmpty(database.Passphrase) &&
       !string.IsNullOrEmpty(database.Username);
 
-    public static void Register(string username, string passphrase)
+    public void Register(string username, string passphrase)
     {
       database.Passphrase = passphrase;
       database.Username = username;
@@ -61,7 +65,7 @@ namespace Passenger
       SaveToFile();
     }
 
-    public static void ResetPassphrase(string oldPassphrase, string newPassphrase)
+    public void ResetPassphrase(string oldPassphrase, string newPassphrase)
     {
       if (database.Passphrase != oldPassphrase) Error.InvalidPassphrase();
       database.Passphrase = newPassphrase;
@@ -72,7 +76,7 @@ namespace Passenger
      * CRUD operations
      */
 
-    public static ListableDatabaseEntry Create(ReadWritableDatabaseEntry entry)
+    public ListableDatabaseEntry Create(ReadWritableDatabaseEntry entry)
     {
       Validate.Entry(entry);
       DatabaseEntry savedEntry = Mapper.CreateDatabaseEntry(
@@ -85,7 +89,7 @@ namespace Passenger
     }
 
     /// <summary>Prevents re-reading and re-crypting the database file</summary>
-    public static string Import(List<DatabaseEntry> entries)
+    public string Import(List<DatabaseEntry> entries)
     {
       try
       {
@@ -99,15 +103,15 @@ namespace Passenger
       catch { Error.ImportFailed(); throw; }
     }
 
-    public static List<ListableDatabaseEntry> FetchAll() =>
+    public List<ListableDatabaseEntry> FetchAll() =>
       database.Entries.Select(
         Mapper.ToListable
       ).ToList();
 
-    public static DatabaseEntry Fetch(string id) =>
+    public DatabaseEntry Fetch(string id) =>
         database.Entries.Find(entry => entry.Id == id);
 
-    public static List<ListableDatabaseEntry> Query(string keyword) =>
+    public List<ListableDatabaseEntry> Query(string keyword) =>
       database.Entries.Where(entry =>
         (entry.Platform != null && entry.Platform.Contains(keyword)) ||
         (entry.Identity != null && entry.Identity.Contains(keyword)) ||
@@ -115,7 +119,7 @@ namespace Passenger
       ).Select(Mapper.ToListable
       ).ToList();
 
-    public static ListableDatabaseEntry Update(string id, ReadWritableDatabaseEntry updatedEntry, bool preserveUpdatedAt = true)
+    public ListableDatabaseEntry Update(string id, ReadWritableDatabaseEntry updatedEntry, bool preserveUpdatedAt = true)
     {
       int index = database.Entries.FindIndex(entry => entry.Id == id);
       if (index == -1) Error.EntryNotFound();
@@ -148,7 +152,7 @@ namespace Passenger
       return Mapper.ToListable(existingEntry);
     }
 
-    public static void Delete(string id)
+    public void Delete(string id)
     {
       database.Entries.RemoveAll(entry => entry.Id == id);
       SaveToFile();
@@ -158,24 +162,25 @@ namespace Passenger
      * Constants pair methods
      */
 
-    public static ConstantPair DeclareConstant(ConstantPair entry)
+    public ConstantPair DeclareConstant(ConstantPair entry)
     {
       Validate.ConstantPair(entry);
+      if (FetchConstant(entry.Key) != null) Error.ConstantExists(entry);
       database.Constants ??= [];
       database.Constants.Add(entry);
       SaveToFile();
       return entry;
     }
 
-    public static ConstantPair FetchConstant(string constant) =>
+    public ConstantPair FetchConstant(string key) =>
       (database.Constants ?? []).Find(pair =>
-        pair.Key == constant
+        pair.Key == key
       );
 
-    public static ConstantPair ModifyConstant(string key, ConstantPair newPair)
+    public ConstantPair ModifyConstant(string key, ConstantPair newPair)
     {
       if (FetchConstant(key) == null) Error.EntryNotFound();
-      Validate.ConstantPair(newPair, false);
+      Validate.ConstantPair(newPair);
       database.Constants[database.Constants.FindIndex(pair =>
         pair.Key == key
       )] = newPair;
@@ -183,7 +188,7 @@ namespace Passenger
       return newPair;
     }
 
-    public static void ForgetConstant(string constant)
+    public void ForgetConstant(string constant)
     {
       if (FetchConstant(constant) == null) Error.EntryNotFound();
       database.Constants.RemoveAll((pair) =>
@@ -196,11 +201,11 @@ namespace Passenger
      * Getters
      */
 
-    public static List<ConstantPair> AllConstants => database.Constants ?? [];
+    public List<ConstantPair> AllConstants => database.Constants ?? [];
 
-    public static List<DatabaseEntry> AllEntries => database.Entries;
+    public List<DatabaseEntry> AllEntries => database.Entries;
 
-    public static List<ReadWritableDatabaseEntry> AllReadWritableEntries =>
+    public List<ReadWritableDatabaseEntry> AllReadWritableEntries =>
       database.Entries.Select(
         Mapper.ToReadWritable
       ).ToList();

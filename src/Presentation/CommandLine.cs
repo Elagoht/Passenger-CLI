@@ -25,11 +25,6 @@ namespace Passenger
         case "detect" or "-t": worker.Detect(); break;
         case "import" or "-i": worker.Import(); break;
         case "export" or "-e": worker.Export(); break;
-        case "declare" or "-D": worker.Declare(); break;
-        case "modify" or "-M": worker.Modify(); break;
-        case "remember" or "-R": worker.Remember(); break;
-        case "forget" or "-F": worker.Forget(); break;
-        case "constants" or "-C": worker.Constants(); break;
         case "generate" or "-g": worker.Generate(); break;
         case "manipulate" or "-m": worker.Manipulate(); break;
         case "version" or "-v" or "--version": Worker.Version(); break;

@@ -185,55 +185,6 @@ namespace Passenger
     }
 
     /*
-     * Constant pairs
-     */
-
-    public void Declare()
-    {
-      RoutineAuthControl("declare", 2);
-      ConstantPair constantPair = new()
-      {
-        Key = arguments[0],
-        Value = arguments[1]
-      };
-      Validate.ConstantPair(constantPair);
-      database.DeclareConstant(constantPair);
-    }
-
-    public void Modify()
-    {
-      RoutineAuthControl("modify", 3);
-      ConstantPair newPair = new()
-      {
-        Key = arguments[1],
-        Value = arguments[2]
-      };
-      database.ModifyConstant(arguments[0], newPair);
-    }
-
-    public void Remember()
-    {
-      RoutineAuthControl("remember", 1);
-      ConstantPair constantPair = database.FetchConstant(arguments[0]);
-      if (constantPair == null) Error.EntryNotFound();
-      Console.WriteLine(JsonSerializer.Serialize(constantPair));
-    }
-
-    public void Forget()
-    {
-      RoutineAuthControl("forget", 1);
-      database.ForgetConstant(arguments[0]);
-    }
-
-    public void Constants()
-    {
-      RoutineAuthControl("constants", 0);
-      Console.WriteLine(
-        JsonSerializer.Serialize(database.AllConstants)
-      );
-    }
-
-    /*
      * Generation
      */
 
@@ -350,28 +301,6 @@ COMMANDS
             Writes to stdout, can be redirected to a file.
             JWT=[jwt] passenger export [method]
 
-      declare -D
-            Declare a new key-value pair, requires a JWT.
-            Theses pairs are constant values that can be replaced
-            on response.
-            JWT=[jwt] passenger declare [key] [value]
-
-      modify -M
-            Modify a key-value pair, requires a JWT.
-            JWT=[jwt] passenger modify [key] [value]
-
-      remember -R
-            Fetch a key-value pair, requires a JWT.
-            JWT=[jwt] passenger remember [key]
-
-      forget -F
-            Forget a key-value pair, requires a JWT.
-            JWT=[jwt] passenger forget [key]
-
-      constants -C
-            List all declared constants, requires a JWT.
-            JWT=[jwt] passenger constants
-
       generate -g
             Generate a passphrase with the given length.
             Default length is 32.
@@ -431,11 +360,6 @@ Commands:
   detect     -d                         : detect issues about security of passphrases
   import     -i [browser]               : import `chromium`, `firefox` or `safari` csv
   export     -e [method]                : export to `bare` or `encrypted` csv
-  declare    -D [key] [value]           : declare a new key-value pair
-  modify     -M [key] [value]           : modify a key-value pair
-  remember   -R [key] [value]           : fetch a key-value pair
-  forget     -F [key]                   : delete a key-value pair
-  constants  -C                         : list all declared constants
   generate   -g [length]                : generate a passphrase with the given length
   manipulate -m [passphrase]            : manipulate a passphrase
   version    -v --version               : show the version and exit

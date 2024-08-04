@@ -61,7 +61,6 @@ namespace Passenger
       database.Passphrase = passphrase;
       database.Username = username;
       database.Entries = [];
-      database.Constants = [];
       SaveToFile();
     }
 
@@ -159,49 +158,8 @@ namespace Passenger
     }
 
     /*
-     * Constants pair methods
-     */
-
-    public ConstantPair DeclareConstant(ConstantPair entry)
-    {
-      Validate.ConstantPair(entry);
-      if (FetchConstant(entry.Key) != null) Error.ConstantExists(entry);
-      database.Constants ??= [];
-      database.Constants.Add(entry);
-      SaveToFile();
-      return entry;
-    }
-
-    public ConstantPair FetchConstant(string key) =>
-      (database.Constants ?? []).Find(pair =>
-        pair.Key == key
-      );
-
-    public ConstantPair ModifyConstant(string key, ConstantPair newPair)
-    {
-      if (FetchConstant(key) == null) Error.EntryNotFound();
-      Validate.ConstantPair(newPair);
-      database.Constants[database.Constants.FindIndex(pair =>
-        pair.Key == key
-      )] = newPair;
-      SaveToFile();
-      return newPair;
-    }
-
-    public void ForgetConstant(string constant)
-    {
-      if (FetchConstant(constant) == null) Error.EntryNotFound();
-      database.Constants.RemoveAll((pair) =>
-        pair.Key == constant
-      );
-      SaveToFile();
-    }
-
-    /*
      * Getters
      */
-
-    public List<ConstantPair> AllConstants => database.Constants ?? [];
 
     public List<DatabaseEntry> AllEntries => database.Entries;
 

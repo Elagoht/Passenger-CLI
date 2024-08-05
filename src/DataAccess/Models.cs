@@ -12,8 +12,6 @@ namespace Passenger
     public string Passphrase { get; set; }
     [JsonPropertyName("entries")]
     public List<DatabaseEntry> Entries { get; set; }
-    [JsonPropertyName("constants")]
-    public List<ConstantPair> Constants { get; set; }
   }
 
   /// <summary>Model to track passphrase statistics changes over time</summary>
@@ -32,15 +30,6 @@ namespace Passenger
   {
     public string Username { get; set; }
     public string Passphrase { get; set; }
-  }
-
-  /// <summary>Key-value pair model for constants</summary>
-  public class ConstantPair
-  {
-    [JsonPropertyName("key"), Required]
-    public string Key { get; set; }
-    [JsonPropertyName("value"), Required]
-    public string Value { get; set; }
   }
 
   /// <summary>Minimum details to use on statistics</summary>

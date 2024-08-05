@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+
 namespace Passenger
 {
   class Authorization(string secretKey)
@@ -14,6 +15,10 @@ namespace Passenger
       {
         IssuedAt = DateTime.UtcNow,
         Issuer = "passenger-cli",
+        Claims = new Dictionary<string, object>
+        {
+          { "username", username }
+        },
         TokenType = "Bearer",
         Expires = DateTime.UtcNow.AddMinutes(10),
         SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature)
@@ -46,14 +51,16 @@ namespace Passenger
 
     public static bool ValidatePassphrase(string username, string passphrase)
     {
+      Database database = new(username);
+
       // TODO: This is a placeholder for a more complex validation algorithm
-      if (!Database.IsRegistered())
+      if (!database.IsRegistered())
       {
         Console.WriteLine("passenger: not registered yet");
         Environment.Exit(1);
       }
-      string passphraseOnDB = Database.GetCredentials().Passphrase;
-      string usernameOnDB = Database.GetCredentials().Username;
+      string passphraseOnDB = database.GetCredentials().Passphrase;
+      string usernameOnDB = database.GetCredentials().Username;
 
       if (passphraseOnDB != passphrase || usernameOnDB != username)
       {
@@ -62,5 +69,11 @@ namespace Passenger
       }
       return true;
     }
+
+    public static string GetUserName(string token) =>
+      new JwtSecurityTokenHandler(
+        ).ReadJwtToken(token
+        ).Claims.First(claim => claim.Type == "username"
+        ).Value;
   }
 }

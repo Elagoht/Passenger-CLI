@@ -26,15 +26,6 @@ namespace Passenger
         _ => true
       };
 
-    public static void ConstantPair(ConstantPair entry, bool checkExistence = true)
-    {
-      // Check if required fields are provided
-      if (string.IsNullOrEmpty(entry.Key)) Error.MissingField("key");
-      if (string.IsNullOrEmpty(entry.Value)) Error.MissingField("value");
-      if (!checkExistence) return;
-      if (Database.FetchConstant(entry.Key) != null) Error.ConstantExists(entry);
-    }
-
     public static ReadWritableDatabaseEntry JsonAsDatabaseEntry(string json)
     {
       try { return JsonSerializer.Deserialize<ReadWritableDatabaseEntry>(json); }

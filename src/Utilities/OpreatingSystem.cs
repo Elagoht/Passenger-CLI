@@ -32,8 +32,8 @@ namespace Passenger
     public static string StoragePath => Path.Combine(
       HomeDirectory,
       CurrentOS == OSType.Windows
-        ? Path.Combine("AppData", "Roaming", ".passenger", "passenger.bus")
-        : Path.Combine(".passenger", "passenger.bus")
+        ? Path.Combine("AppData", "Roaming", ".passenger")
+        : Path.Combine(".passenger")
     );
   }
 }

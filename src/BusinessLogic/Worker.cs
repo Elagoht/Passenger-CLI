@@ -7,7 +7,7 @@ namespace Passenger
     private readonly Authorization authorization = new(EnDeCoder.JSWSecret);
     private readonly string[] arguments = args.Skip(1).ToArray();
     private readonly string piped = piped;
-    private Database database;
+    private Database Database;
 
     private void RoutineAuthControl(string verbName, int minOrActual, int max = -1)
     {
@@ -19,7 +19,7 @@ namespace Passenger
         Error.InvalidToken();
 
       // Initialize database
-      database = new Database(Authorization.GetUserName(token));
+      Database = new Database(Authorization.GetUserName(token));
     }
 
     private void RequirePipedInput()
@@ -41,16 +41,18 @@ namespace Passenger
     public void Register()
     {
       if (arguments.Length != 2) Error.ArgumentCount("register", 2);
-      if (database.IsRegistered())
+      // Routine control is not called here, so initialize database manually
+      Database = new Database(arguments[0]);
+      if (Database.IsRegistered())
         Console.WriteLine("passenger: already registered");
       else
-        database.Register(arguments[0], arguments[1]);
+        Database.Register(arguments[0], arguments[1]);
     }
 
     public void Reset()
     {
       RoutineAuthControl("reset", 2);
-      database.ResetPassphrase(arguments[0], arguments[1]);
+      Database.ResetPassphrase(arguments[0], arguments[1]);
     }
 
     /*
@@ -61,7 +63,7 @@ namespace Passenger
     {
       RoutineAuthControl("create", 1);
       Console.WriteLine(JsonSerializer.Serialize(
-        database.Create(Validate.JsonAsDatabaseEntry(arguments[0]))
+        Database.Create(Validate.JsonAsDatabaseEntry(arguments[0]))
       ));
     }
 
@@ -69,7 +71,7 @@ namespace Passenger
     {
       RoutineAuthControl("fetchAll", 0);
       Console.WriteLine(JsonSerializer.Serialize(
-        database.FetchAll()
+        Database.FetchAll()
       ));
     }
 
@@ -83,10 +85,10 @@ namespace Passenger
        * the stats of the passphrase, not the
        * passphrase itself.
        */
-      DatabaseEntry entry = database.Fetch(arguments[0]);
+      DatabaseEntry entry = Database.Fetch(arguments[0]);
       if (entry == null) Error.EntryNotFound();
       entry.TotalAccesses++;
-      database.Update(entry.Id, entry, false);
+      Database.Update(entry.Id, entry, false);
       Console.WriteLine(JsonSerializer.Serialize(entry));
     }
 
@@ -95,7 +97,7 @@ namespace Passenger
       RoutineAuthControl("query", 1);
       Console.WriteLine(
         JsonSerializer.Serialize(
-          database.Query(arguments[0])
+          Database.Query(arguments[0])
         )
       );
     }
@@ -106,14 +108,14 @@ namespace Passenger
       ReadWritableDatabaseEntry entry = Validate.JsonAsDatabaseEntry(arguments[1]);
       Validate.Entry(entry);
       Console.WriteLine(JsonSerializer.Serialize(
-        database.Update(arguments[0], entry)
+        Database.Update(arguments[0], entry)
       ));
     }
 
     public void Delete()
     {
       RoutineAuthControl("delete", 1);
-      database.Delete(arguments[0]);
+      Database.Delete(arguments[0]);
     }
 
     /*
@@ -123,7 +125,7 @@ namespace Passenger
     public void Statistics()
     {
       RoutineAuthControl("stats", 0);
-      Statistics statistics = new(database.AllReadWritableEntries);
+      Statistics statistics = new(Database.AllReadWritableEntries);
       DashboardData dashboardData = new()
       {
         TotalCount = statistics.TotalCount,
@@ -147,7 +149,7 @@ namespace Passenger
     public void Detect()
     {
       RoutineAuthControl("detect", 0);
-      Detective detective = new(database.AllEntries);
+      Detective detective = new(Database.AllEntries);
       Console.WriteLine(JsonSerializer.Serialize(detective));
     }
 
@@ -171,7 +173,7 @@ namespace Passenger
       if (skippedEntries.Count > 0)
         Error.ImportHasBadEntries(skippedEntries, mappedEntries);
 
-      Console.WriteLine(database.Import(mappedEntries));
+      Console.WriteLine(Database.Import(mappedEntries));
     }
 
     public void Export()
@@ -180,7 +182,7 @@ namespace Passenger
       if (!Browser.exportTypes.Contains(arguments[0]))
         Error.ExportTypeNotSupported();
       Console.WriteLine(Browser.Export(
-        arguments[0], database.AllReadWritableEntries
+        arguments[0], Database.AllReadWritableEntries
       ));
     }
 

@@ -16,7 +16,7 @@ namespace Passenger
       if (arguments.Length < minOrActual || (max != -1 && arguments.Length > max))
         Error.ArgumentCount(verbName, minOrActual, max);
       if (!authorization.ValidateToken(token))
-        Error.InvalidToken();
+        Error.AuthorizationFailed();
 
       // Initialize database
       Database = new Database(Authorization.GetUserName(token));

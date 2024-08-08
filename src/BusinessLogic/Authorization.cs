@@ -56,7 +56,7 @@ namespace Passenger
       // TODO: This is a placeholder for a more complex validation algorithm
       if (!database.IsRegistered())
       {
-        Console.WriteLine("passenger: not registered yet");
+        Error.AuthorizationFailed();
         Environment.Exit(1);
       }
       string passphraseOnDB = database.GetCredentials().Passphrase;
@@ -64,7 +64,7 @@ namespace Passenger
 
       if (passphraseOnDB != passphrase || usernameOnDB != username)
       {
-        Console.WriteLine("passenger: passphrase could not be validated");
+        Error.AuthorizationFailed();
         Environment.Exit(1);
       }
       return true;

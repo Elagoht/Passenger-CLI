@@ -28,16 +28,10 @@ namespace Passenger
       Environment.Exit(40);
     }
 
-    public static void InvalidToken()
+    public static void AuthorizationFailed()
     {
-      Console.Error.WriteLine("passenger: invalid token");
+      Console.Error.WriteLine("passenger: authorization failed");
       Environment.Exit(41);
-    }
-
-    public static void InvalidPassphrase()
-    {
-      Console.Error.WriteLine("passenger: master passphrase did not match");
-      Environment.Exit(40);
     }
 
     public static void SecretKeyNotProvided()

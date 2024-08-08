@@ -34,6 +34,12 @@ namespace Passenger
       Environment.Exit(41);
     }
 
+    public static void UserExists()
+    {
+      Console.Error.WriteLine("passenger: a user with the same username already exists");
+      Environment.Exit(49);
+    }
+
     public static void SecretKeyNotProvided()
     {
       Console.Error.WriteLine("passenger: secret key not provided");

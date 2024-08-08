@@ -44,7 +44,7 @@ namespace Passenger
       // Routine control is not called here, so initialize database manually
       Database = new Database(arguments[0]);
       if (Database.IsRegistered())
-        Console.WriteLine("passenger: already registered");
+        Error.UserExists();
       else
         Database.Register(arguments[0], arguments[1]);
     }

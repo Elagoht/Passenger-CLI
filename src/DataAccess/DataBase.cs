@@ -66,7 +66,7 @@ namespace Passenger
 
     public void ResetPassphrase(string oldPassphrase, string newPassphrase)
     {
-      if (database.Passphrase != oldPassphrase) Error.InvalidPassphrase();
+      if (database.Passphrase != oldPassphrase) Error.AuthorizationFailed();
       database.Passphrase = newPassphrase;
       SaveToFile();
     }

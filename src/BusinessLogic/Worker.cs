@@ -331,7 +331,7 @@ AUTHOR
 SEE ALSO
       jq(1)
 
-{GlobalConstants.VERSION}                              May 2024                       PASSENGER(1)"
+{GlobalConstants.VERSION}                              Aug 2024                       PASSENGER(1)"
       );
       Environment.Exit(0);
     }

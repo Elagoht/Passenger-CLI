@@ -1,3 +1,6 @@
+<div align="center">
+<img src="https://raw.githubusercontent.com/Elagoht/Passenger-Landing/main/public/assets/logo.png" width="192" height="192" />
+
 # Passenger CLI
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/Elagoht/Passenger-cli/release.yaml)
@@ -9,6 +12,7 @@
 ![GitHub License](https://img.shields.io/github/license/Elagoht/Passenger-cli)
 
 Passenger is a sophisticated passphrase manager designed to securely store your passphrases. This project encompasses the backend and database components, leveraging AES GCM encryption alongside a user-written custom and unique symmetric encoding-decoding algorithm to ensure maximum security. The AES GCM secret key is required as an environment variable to enhance security.
+</div>
 
 ## Features
 

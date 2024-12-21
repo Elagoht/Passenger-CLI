@@ -42,7 +42,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: "9.0.x"
 
       - name: Install dependencies
         run: dotnet restore src
@@ -66,7 +66,7 @@ jobs:
           powershell Compress-Archive -Path publish\* -DestinationPath ${{ matrix.os }}-${{ matrix.architecture }}-artifact.zip
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-${{ matrix.architecture }}-artifact
           path: ./${{ matrix.os }}-${{ matrix.architecture }}-artifact.zip

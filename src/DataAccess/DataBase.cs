@@ -11,6 +11,9 @@ namespace Passenger
     {
       try
       {
+        if (!Directory.Exists(OperatingSystem.StoragePath))
+          Directory.CreateDirectory(OperatingSystem.StoragePath);
+
         databaseFile = Path.Combine(
           OperatingSystem.StoragePath,
           $"{username}.bus"
@@ -108,7 +111,7 @@ namespace Passenger
       ).ToList();
 
     public DatabaseEntry Fetch(string id) =>
-        database.Entries.Find(entry => entry.Id == id);
+      database.Entries.Find(entry => entry.Id == id);
 
     public List<ListableDatabaseEntry> Query(string keyword) =>
       database.Entries.Where(entry =>
